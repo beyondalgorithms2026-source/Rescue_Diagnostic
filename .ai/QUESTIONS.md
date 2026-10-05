@@ -7,6 +7,7 @@ The template uses `gpt-4o-mini` via `api.openai.com`. Needed from the owner:
 - Is `gpt-4o-mini` still served on your account (Sep 2026)? If not, which model replaces it for **both** phases (the baseline must stay as published except §2.3; a model swap is a baseline change and must be disclosed)? 
 - Current per-million-token input/output prices for that model → `LLM_PRICE_IN_PER_MTOK`, `LLM_PRICE_OUT_PER_MTOK`. Not guessed... 
 - Total project spend ceiling. Default per-run cap is $2.00 (ADR-002); ~4 runs expected. 
+
 Answer (2026-10-05):
 - Model for both phases: gpt-4o-mini-2024-07-18. A later swap is a baseline change and must be disclosed.
 - LLM_PRICE_IN_PER_MTOK=0.15, LLM_PRICE_OUT_PER_MTOK=0.60. These go in the Config node, not in workflow code.
