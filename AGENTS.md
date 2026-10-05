@@ -28,6 +28,23 @@ AGENTS.md → accepted ADRs (`docs/DECISIONS.md`) → `docs/ARCHITECTURE.md` →
 - Reviewer reports findings (file:line + how it fails); reviewer does not rewrite.
 - Stuck on an architecture question → write it in `.ai/QUESTIONS.md` and stop.
 
+## Closeout (every milestone)
+Before you stop, overwrite .ai/REVIEW.md. Do not append.
+Write 80% ASD-STE100: one fact per sentence. Max 12 lines. No synonyms. No praise.
+
+Use these headings only:
+- Changed: files you edited.
+- Did: the one task you finished.
+- Did-not: files and tasks you left alone.
+- Check: the command you ran, and the result.
+- Risk: one thing still open. Write "none" if there is none.
+- Next: the next task id from tasks.md.
+
+Add one mermaid diagram of the path you touched.
+Do not make an HTML page. Do not make a video. Do not add a dependency.
+If the diagram needs more than 12 nodes, the task was too big. Stop and say so in Risk.
+Print that same card as your final chat reply. Do not add a longer summary. The file and the reply must match.
+
 ## Commands (real; they run once T1 creates `src/` and `tests/`)
 ```bash
 python3 -m unittest discover -s tests -t . -v        # tests
