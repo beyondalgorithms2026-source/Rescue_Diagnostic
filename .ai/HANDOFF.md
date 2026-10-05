@@ -1,11 +1,12 @@
 # Current handoff
-Task: T5 complete — local append-only HTTP sink.
+Task: T6 complete — baseline fetch, equivalence builder, DIFF.md, local smoke.
 Branch: main
-Done: `src/sink/server.py` implements authenticated append, lookup, ledger, replay control, fault injection, request logging, and row stamps. `.env.example` lists the frozen variable names. T5 is ticked.
-Tests / checks run: `python3 -m unittest discover -s tests -t . -v` — 17 tests passed, including an ephemeral-port sink test. `python3 -m compileall -q src tests` and the required secret grep were run.
-Next task: T6 — baseline workflow fetch and documented swaps.
-Read first: AGENTS.md; `.ai/STATUS.md`; `docs/DECISIONS.md`; `docs/ARCHITECTURE.md`; `specs/t2-rescue/tasks.md`; `specs/t2-rescue/plan.md` §T6.
-Do not change: architecture contracts, docs/DECISIONS.md, or tasks beyond T6.
-Open risk: T1 scorer attribution checks `input_id` or `active_input`, while architecture §3.4 requires sink stamp `replay_input_id`. Resolve before T8 scoring.
-Push: `main` through T5 and tags `v0.3.0` and `t5-sink` reached `origin` after explicit user approval. The existing staged `.ai/QUESTIONS.md` change was not included.
-Targets: local only. T5 tests used an ephemeral loopback port.
+Done: `src/baseline/fetch.py` pulls template 16643 from api.n8n.io into gitignored `workflows/baseline/upstream/`. `src/baseline/equivalent.py` applies swaps S-1..S-8 only (Webhook + Form shim, header auth, sink nodes for Sheets/Gmail, Gmail recipient shim, model pin per Q-1, credential names, workflow id). Upstream and equivalent JSON are not committed (Q-3). `workflows/baseline/DIFF.md` lists swaps, divergences, and smoke evidence. README has the attribution line, fetch steps, and the `n8nio/n8n:2.22.5` pin. T6 is ticked.
+Tests / checks run: `python3 -m unittest discover -s tests -t .` — 23 tests OK (6 new in `tests/test_baseline.py`, including one on the real fetched template). `compileall` OK. Secret grep: only the known pattern literals in `src/checks/static_checks.py` and `tests/test_static_checks.py`.
+Smoke: local n8n 2.22.5, fixture t2-001. Faithful equivalent fails at node 2 (`no binary field 'data'`). Probe with node 2 fixed fails at node 3 (`JSON Body ... not valid JSON`). No sink rows, no OpenAI call. Workflow `t2BaselineEquiv1` is imported, unpublished. Credentials `t2-openai` (placeholder value, not a key), `t2-webhook-auth`, `t2-sink-auth` exist in local n8n with throwaway values; T7 setup must overwrite them.
+Next task: T7 — replay runner (`src/replay/run.py`), local target only (Q-6).
+Read first: AGENTS.md; `.ai/QUESTIONS.md` Q-1, Q-6, Q-7; `docs/ARCHITECTURE.md` §1.1, §4, §5.4–5.5; `specs/t2-rescue/plan.md` §T7; `workflows/baseline/DIFF.md`; `src/baseline/equivalent.py` (`bind_credentials`, `substitute`).
+T7 notes: Q-6 forbids the public API. Use the CLI path proven in T6: `docker exec -e N8N_SECURE_COOKIE=false n8n n8n import:credentials|import:workflow|publish:workflow|unpublish:workflow`, then `docker restart n8n` (CLI publish takes effect only after restart). Read execution outcome from the n8n SQLite DB read-only (`execution_entity`, `execution_data`; `sqlite3` module ships in the container). The multipart file field must be named `Invoice_PDF`. Wrong webhook token returns 403.
+Do not change: AGENTS.md, CLAUDE.md, docs/DECISIONS.md, frozen contracts in docs/ARCHITECTURE.md, `src/baseline/*` swaps (without updating DIFF.md and tests), tasks beyond T7.
+Open questions: Q-7 (how to score a baseline that cannot reach its LLM) blocks T8, not T7.
+Open risk (carried from T5): T1 scorer attribution checks `input_id`/`active_input`; sink stamps `replay_input_id`. Resolve before T8 scoring.

@@ -68,6 +68,24 @@ Decision:
 
 Unblocks T8 against local. Do not add an online target to tasks.md.
 
+## Q-7 The published template cannot reach its LLM — how do we score the baseline? — blocks T8
+Found in T6 (evidence: `workflows/baseline/DIFF.md` § Manual smoke, n8n 2.22.5, executions 342/343):
+- U-1: node 2 reads binary `data`; the Form Trigger stores the PDF as `Invoice_PDF`. Every submission fails at node 2.
+- U-2: node 3's JSON body appends the PDF text outside the JSON string. Even with U-1 fixed, node 3 fails before OpenAI.
+- Also from source (not yet exercised): node 9's totals check always passes (Sheets output lacks the fields it reads), and
+  the Gmail node always refuses the empty recipient. The template never sends its report.
+Consequence: an as-published baseline gives 50 × silent_drop (no row, no error row), zero tokens, zero field scores.
+Options:
+(a) Score as published only. Honest, but the field-level before/after is empty.
+(b) Add disclosed "minimum buyer repairs" R-1 (node 2 key) and R-2 (node 3 body escaping) to the equivalent and score that
+    as the baseline; report U-1/U-2 separately as "does not run out of the box".
+(c) Run both: as-published (expected all silent_drop, costs $0) and repaired. Scorecard stays 100 rows (repaired vs hardened);
+    the as-published run is cited in findings only.
+Recommended: (c). It keeps the frozen scorecard shape and does not hide that the template fails out of the box.
+Also: the 3 notes-field injection inputs have no path to the model in the upstream template (Notes is never put in the
+prompt). They will score as not followed in baseline. That is a correct result, not a harness bug.
+Answer:
+
 ## Q-5 Git — blocks the first commit
 This folder is not a git repository. Thin Ledger Session A says the human runs `git init`. Public remote name/visibility is a later human gate.
 Answer (2026-10-05): git init done by hand. No public remote yet.

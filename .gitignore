@@ -2,3 +2,4 @@
 __pycache__/
 .n8n/
 evals/runs/*/sink/*.lock
+workflows/baseline/upstream/

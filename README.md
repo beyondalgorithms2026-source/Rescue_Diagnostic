@@ -5,6 +5,11 @@ and Gmail"** ([n8n.io/workflows/16643](https://n8n.io/workflows/16643-extract-an
 by creator `isawow`). We replay 50 labelled invoices through the template as published, record what goes
 wrong, harden it, and replay the same 50 again. You can re-run both.
 
+Baseline is n8n community template 16643, 'Extract and validate invoice PDFs with OpenAI, Google Sheets, and Gmail'
+by isaWOW (https://n8n.io/workflows/16643-extract-and-validate-invoice-pdfs-with-openai-google-sheets-and-gmail/),
+marked Use for free. No republish licence was stated, so the upstream JSON is not vendored. You fetch it yourself;
+our node swaps are listed in [`workflows/baseline/DIFF.md`](workflows/baseline/DIFF.md).
+
 > **All data is synthetic.** Every invoice, vendor, person and email address in this repo was generated for
 > this test. Vendors are fictional US/UK/EU businesses; amounts are in USD, EUR or GBP; every PDF has the footer
 > "SYNTHETIC TEST DOCUMENT — NOT A REAL INVOICE". No client data was used.
@@ -36,12 +41,21 @@ Status: **harness only** — no run results yet. See `.ai/STATUS.md`.
 Requires Docker (n8n), Python 3.9+, an OpenAI API key. No Google account needed — writes go to a local
 append-only sink (`src/sink/`) that stands in for Sheets and Gmail.
 
-The published results were produced on a live online n8n instance; you replay on your own local Docker n8n
-with the same workflow files. Numbers will differ slightly (model non-determinism); formats and the
-no-duplicate-rows property should not.
+The published results are produced on a local Docker n8n (QUESTIONS Q-6); you replay on yours with the same
+workflow files. Numbers will differ slightly (model non-determinism); formats and the no-duplicate-rows
+property should not.
 
 ```bash
+docker run -d --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n n8nio/n8n:2.22.5
+```
+```bash
 cp .env.example .env
+```
+```bash
+python3 -m src.baseline.fetch
+```
+```bash
+python3 -m src.baseline.equivalent
 ```
 ```bash
 python3 -m src.replay.run setup --target local --phase baseline
@@ -59,7 +73,8 @@ python3 -m src.replay.run run --target local --phase hardened
 python3 -m src.score.score --baseline <baseline_run_id> --hardened <hardened_run_id> --out evals/scorecard.csv
 ```
 
-n8n version pin: *to be set in T6*. Spend is capped per run (`RUN_USD_CAP`, default $2.00).
+n8n version pin: **`n8nio/n8n:2.22.5`** (Q-2). The baseline equivalence was smoke-tested on that version; other
+versions may change node behaviour. Spend is capped per run (`RUN_USD_CAP`, owner setting $0.25 — Q-1).
 
 ## Results
 
