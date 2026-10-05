@@ -1,0 +1,4 @@
+input_id,pass,run_id,execution_id,dedupe_key,invoice_no,vendor,invoice_date,currency,subtotal,tax,total,total_cgst,total_sgst,capped
+stub-001,A,STUB-baseline,exec-stub-001,INV-42|harbour and finch|USD,INV-42,Harbour & Finch Ltd.,2026-03-12,USD,100,10,109,,,0
+stub-002,A,STUB-baseline,exec-stub-002,INV-42|harbour and finch|USD,INV-42,Harbour & Finch Ltd.,2026-03-12,USD,100,10,109,,,0
+stub-002,A,STUB-baseline,exec-stub-002,INV-42|harbour and finch|USD,INV-42,Harbour & Finch Ltd.,2026-03-12,USD,100,10,109,,,0

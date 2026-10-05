@@ -1,0 +1,28 @@
+{
+  "STUB": true,
+  "input_id": "stub-001",
+  "synthetic": true,
+  "label_bucket": "clean",
+  "expected": {
+    "invoice_no": "INV-42",
+    "vendor": "Harbour & Finch Ltd.",
+    "invoice_date": "2026-03-12",
+    "currency": "USD",
+    "subtotal": 100.0,
+    "tax": 10.0,
+    "total": 110.0,
+    "line_items": [
+      {
+        "description": "Widget",
+        "quantity": 1,
+        "unit_price": 100,
+        "line_total": 100
+      }
+    ]
+  },
+  "dedupe_key": "INV-42|harbour and finch|USD",
+  "expect_outcome": "committed",
+  "doc_foots": true,
+  "fault": null,
+  "injection": null
+}

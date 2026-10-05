@@ -1,0 +1,5 @@
+# STUB fixture; synthetic only
+input_id,filename,label_bucket,gold_path
+stub-001,stub-001.pdf,clean,tests/fixtures/stub_run/gold/stub-001.json
+stub-002,stub-002.pdf,duplicate,tests/fixtures/stub_run/gold/stub-002.json
+stub-003,stub-003.pdf,missing_field,tests/fixtures/stub_run/gold/stub-003.json

@@ -4,7 +4,7 @@ One box = one Codex session = one focused commit. Dependency order. Tick the box
 Each task's acceptance is in `plan.md` under the same id. Do not start a task whose dependencies are unticked.
 
 - [x] **T0** Harness skeleton: AGENTS, CLAUDE, README, docs, .ai, specs, evals/README (architecture session, Opus)
-- [ ] **T1** `src/common/norm.py` (invoice_no_norm, vendor_norm, dedupe_key, amount/date/currency parsers) + `src/score/score.py` reading manifest, gold, and a run dir; writes the frozen scorecard columns and prints rollups. Tests use a hand-built `tests/fixtures/stub_run/` labelled STUB (3 inputs, both phases). `.gitignore`. — deps: T0
+- [x] **T1** `src/common/norm.py` (invoice_no_norm, vendor_norm, dedupe_key, amount/date/currency parsers) + `src/score/score.py` reading manifest, gold, and a run dir; writes the frozen scorecard columns and prints rollups. Tests use a hand-built `tests/fixtures/stub_run/` labelled STUB (3 inputs, both phases). `.gitignore`. — deps: T0
 - [ ] **T2** `src/checks/static_checks.py`: secret grep + workflow audit (external nodes without onError / with unbounded retries / missing timeout) → `static_checks.json`; tests with tiny inline JSON snippets. — deps: T1
 - [ ] **T3** `src/fixtures/pdfwriter.py` (stdlib text-only PDF) + `make_inputs.py` generating the 14 clean + 12 messy inputs, gold JSON, manifest rows. Deterministic seed. Footer invariant I-1. — deps: T1
 - [ ] **T4** Extend generator: 8 duplicate, 6 missing_field, 6 injection, 4 oversized; faults on 2 clean + 2 messy; full 50-row manifest; test that every gold passes schema and every PDF text contains the footer. — deps: T3

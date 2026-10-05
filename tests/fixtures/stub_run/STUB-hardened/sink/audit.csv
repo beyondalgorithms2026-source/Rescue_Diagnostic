@@ -1,0 +1,4 @@
+input_id,pass,run_id,execution_id,status,usd,capped,code
+stub-001,A,STUB-hardened,exec-stub-001,committed,0.01,0,
+stub-002,A,STUB-hardened,exec-stub-002,committed,0.01,0,
+stub-003,A,STUB-hardened,exec-stub-003,committed,0.01,0,

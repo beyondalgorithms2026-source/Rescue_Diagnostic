@@ -1,0 +1,4 @@
+.env
+__pycache__/
+.n8n/
+evals/runs/*/sink/*.lock
