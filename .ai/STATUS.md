@@ -4,7 +4,7 @@
 |---|---|---|
 | M0 Harness + architecture (T0) | Done, awaiting human acceptance of ADR-001/002 and frozen contracts | this commit |
 | M1 Scorer + static checks (T1–T2) | Done | T1 scorer and T2 static checks; 10 unit tests pass |
-| M2 50 synthetic inputs (T3–T4) | Not started | — |
+| M2 50 synthetic inputs (T3–T4) | In progress | T3 PDF writer and deterministic 26-input clean/messy generator complete; T4 remains |
 | M3 Sink + baseline + runner (T5–T7) | Not started; T6 blocked on Q-2, Q-3 | — |
 | M4 Baseline run + trace reading (T8) | Blocked on Q-1, Q-6 (online target) | — |
 | M5 Hardened + replay (T9–T11) | Not started | — |
@@ -13,4 +13,4 @@
 
 Targets: local Docker n8n 2.22.5 (running, image unpinned `latest`); online instance TBD (Q-6).
 
-Last updated: 2026-10-05 (T2 static checks).
+Last updated: 2026-10-05 (T3 fixture generator).
