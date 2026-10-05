@@ -1,0 +1,86 @@
+{
+  "dedupe_key": "INV-2026-022|silverline packaging|USD",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "USD",
+    "invoice_date": "2026-03-13",
+    "invoice_no": "INV-2026-022",
+    "line_items": [
+      {
+        "description": "Workshop gloves",
+        "line_total": 130.24,
+        "quantity": 4,
+        "unit_price": 32.56
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 645.05,
+        "quantity": 5,
+        "unit_price": 129.01
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 102.8,
+        "quantity": 2,
+        "unit_price": 51.4
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 465.6,
+        "quantity": 4,
+        "unit_price": 116.4
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 358.26,
+        "quantity": 3,
+        "unit_price": 119.42
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 264.4,
+        "quantity": 2,
+        "unit_price": 132.2
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 145.2,
+        "quantity": 2,
+        "unit_price": 72.6
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 492.64,
+        "quantity": 4,
+        "unit_price": 123.16
+      }
+    ],
+    "subtotal": 2604.19,
+    "tax": 214.85,
+    "total": 2819.04,
+    "vendor": "Silverline Packaging"
+  },
+  "fault": {
+    "pass": "A",
+    "status": 503,
+    "target": "line_items",
+    "times": 1
+  },
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-022",
+  "label_bucket": "messy",
+  "synthetic": true
+}

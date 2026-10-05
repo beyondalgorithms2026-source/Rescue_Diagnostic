@@ -1,0 +1,81 @@
+{
+  "dedupe_key": "INV-2026-014|acme|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-16",
+    "invoice_no": "INV-2026-014",
+    "line_items": [
+      {
+        "description": "Packing tape",
+        "line_total": 663.9,
+        "quantity": 5,
+        "unit_price": 132.78
+      },
+      {
+        "description": "File folders",
+        "line_total": 524.2,
+        "quantity": 5,
+        "unit_price": 104.84
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 259.48,
+        "quantity": 2,
+        "unit_price": 129.74
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 23.2,
+        "quantity": 2,
+        "unit_price": 11.6
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 135.68,
+        "quantity": 4,
+        "unit_price": 33.92
+      },
+      {
+        "description": "File folders",
+        "line_total": 73.92,
+        "quantity": 1,
+        "unit_price": 73.92
+      },
+      {
+        "description": "Shipping labels",
+        "line_total": 837.45,
+        "quantity": 5,
+        "unit_price": 167.49
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 275.4,
+        "quantity": 2,
+        "unit_price": 137.7
+      }
+    ],
+    "subtotal": 2793.23,
+    "tax": 230.44,
+    "total": 3023.67,
+    "vendor": "Acme Co. Inc."
+  },
+  "fault": null,
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-014",
+  "label_bucket": "clean",
+  "synthetic": true
+}

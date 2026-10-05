@@ -1,0 +1,75 @@
+{
+  "dedupe_key": "INV-2026-008|silverline packaging|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-25",
+    "invoice_no": "INV-2026-008",
+    "line_items": [
+      {
+        "description": "Replacement cartridges",
+        "line_total": 489.6,
+        "quantity": 3,
+        "unit_price": 163.2
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 85.59,
+        "quantity": 3,
+        "unit_price": 28.53
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 436.35,
+        "quantity": 5,
+        "unit_price": 87.27
+      },
+      {
+        "description": "Packing tape",
+        "line_total": 103.21,
+        "quantity": 1,
+        "unit_price": 103.21
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 446.76,
+        "quantity": 3,
+        "unit_price": 148.92
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 134.77,
+        "quantity": 1,
+        "unit_price": 134.77
+      },
+      {
+        "description": "Packing tape",
+        "line_total": 464.76,
+        "quantity": 3,
+        "unit_price": 154.92
+      }
+    ],
+    "subtotal": 2161.04,
+    "tax": 178.29,
+    "total": 2339.33,
+    "vendor": "Silverline Packaging"
+  },
+  "fault": null,
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-008",
+  "label_bucket": "clean",
+  "synthetic": true
+}

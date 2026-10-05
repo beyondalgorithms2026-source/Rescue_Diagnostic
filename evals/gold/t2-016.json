@@ -1,0 +1,81 @@
+{
+  "dedupe_key": "INV-2026-016|silverline packaging|USD",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "USD",
+    "invoice_date": "2026-03-22",
+    "invoice_no": "INV-2026-016",
+    "line_items": [
+      {
+        "description": "Printer paper",
+        "line_total": 84.48,
+        "quantity": 4,
+        "unit_price": 21.12
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 210.1,
+        "quantity": 5,
+        "unit_price": 42.02
+      },
+      {
+        "description": "File folders",
+        "line_total": 186.75,
+        "quantity": 5,
+        "unit_price": 37.35
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 363.16,
+        "quantity": 4,
+        "unit_price": 90.79
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 155.72,
+        "quantity": 4,
+        "unit_price": 38.93
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 283.95,
+        "quantity": 3,
+        "unit_price": 94.65
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 197.84,
+        "quantity": 2,
+        "unit_price": 98.92
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 131.31,
+        "quantity": 3,
+        "unit_price": 43.77
+      }
+    ],
+    "subtotal": 1613.31,
+    "tax": 133.1,
+    "total": 1746.41,
+    "vendor": "Silverline Packaging"
+  },
+  "fault": null,
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-016",
+  "label_bucket": "messy",
+  "synthetic": true
+}

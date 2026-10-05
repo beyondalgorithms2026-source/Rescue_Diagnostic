@@ -1,0 +1,67 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1037 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 48 744 Tm
+(INVOICE) Tj
+1 0 0 1 48 729 Tm
+(Invoice number: INV-2026-043) Tj
+1 0 0 1 48 714 Tm
+(Vendor: Cedar Ridge Components) Tj
+1 0 0 1 48 699 Tm
+(Invoice date: 2026-03-22) Tj
+1 0 0 1 48 684 Tm
+(Currency: USD) Tj
+1 0 0 1 48 669 Tm
+(Description                         Qty x Unit             Line total) Tj
+1 0 0 1 48 654 Tm
+(Printer paper                  5 x     $ 152.13       $ 760.65) Tj
+1 0 0 1 48 639 Tm
+(Desk organizers                5 x     $ 108.22       $ 541.10) Tj
+1 0 0 1 48 624 Tm
+(Desk organizers                5 x     $ 158.08       $ 790.40) Tj
+1 0 0 1 48 609 Tm
+(Packing tape                   5 x     $ 104.79       $ 523.95) Tj
+1 0 0 1 48 594 Tm
+(Replacement cartridges         3 x      $ 23.10        $ 69.30) Tj
+1 0 0 1 48 579 Tm
+(Archive boxes                  2 x      $ 82.46       $ 164.92) Tj
+1 0 0 1 48 564 Tm
+(Subtotal: $ 2,850.32) Tj
+1 0 0 1 48 549 Tm
+(Tax: $ 235.15) Tj
+1 0 0 1 48 534 Tm
+(Total: $ 3,085.47) Tj
+1 0 0 1 48 519 Tm
+(SYNTHETIC TEST DOCUMENT ó NOT A REAL INVOICE) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1432
+%%EOF

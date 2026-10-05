@@ -1,0 +1,45 @@
+{
+  "dedupe_key": "INV-2026-012|acme|GBP",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "GBP",
+    "invoice_date": "2026-03-10",
+    "invoice_no": "INV-2026-012",
+    "line_items": [
+      {
+        "description": "Archive boxes",
+        "line_total": 331.78,
+        "quantity": 2,
+        "unit_price": 165.89
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 668.52,
+        "quantity": 4,
+        "unit_price": 167.13
+      }
+    ],
+    "subtotal": 1000.3,
+    "tax": 82.52,
+    "total": 1082.82,
+    "vendor": "Acme Co. Inc."
+  },
+  "fault": null,
+  "form": {
+    "currency": "GBP",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-012",
+  "label_bucket": "clean",
+  "synthetic": true
+}

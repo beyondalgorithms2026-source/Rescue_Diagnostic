@@ -1,0 +1,51 @@
+{
+  "dedupe_key": "INV-2026-002|muller druck|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-07",
+    "invoice_no": "INV-2026-002",
+    "line_items": [
+      {
+        "description": "File folders",
+        "line_total": 411.75,
+        "quantity": 3,
+        "unit_price": 137.25
+      },
+      {
+        "description": "File folders",
+        "line_total": 381.6,
+        "quantity": 3,
+        "unit_price": 127.2
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 160.71,
+        "quantity": 3,
+        "unit_price": 53.57
+      }
+    ],
+    "subtotal": 954.06,
+    "tax": 78.71,
+    "total": 1032.77,
+    "vendor": "Muller Druck GmbH"
+  },
+  "fault": null,
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-002",
+  "label_bucket": "clean",
+  "synthetic": true
+}

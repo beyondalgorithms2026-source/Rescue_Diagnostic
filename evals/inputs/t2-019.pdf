@@ -1,0 +1,61 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 783 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 48 744 Tm
+(INVOICE) Tj
+1 0 0 1 48 729 Tm
+([SUPPLIER LOGO: Kingswell Stationery]) Tj
+1 0 0 1 48 714 Tm
+(Invoice number: INV-2026-019) Tj
+1 0 0 1 48 699 Tm
+(Invoice date: 03/04/2026) Tj
+1 0 0 1 48 684 Tm
+(Currency: USD) Tj
+1 0 0 1 48 669 Tm
+(Description                         Qty x Unit             Line total) Tj
+1 0 0 1 48 654 Tm
+(Workshop gloves                4 x     $ 133.42       $ 533.68) Tj
+1 0 0 1 48 639 Tm
+(Packing tape                   2 x     $ 173.79       $ 347.58) Tj
+1 0 0 1 48 624 Tm
+(Packing tape                   1 x      $ 52.15        $ 52.15) Tj
+1 0 0 1 48 609 Tm
+(Subtotal: $ 933.41) Tj
+1 0 0 1 48 594 Tm
+(Tax: $ 77.01) Tj
+1 0 0 1 48 579 Tm
+(Total: $ 1,010.42) Tj
+1 0 0 1 48 564 Tm
+(SYNTHETIC TEST DOCUMENT ó NOT A REAL INVOICE) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1177
+%%EOF

@@ -1,0 +1,71 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1216 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 48 744 Tm
+(INVOICE) Tj
+1 0 0 1 48 729 Tm
+([SUPPLIER LOGO: Silverline Packaging]) Tj
+1 0 0 1 48 714 Tm
+(Invoice number: INV-2026-016) Tj
+1 0 0 1 48 699 Tm
+(Invoice date: 03/22/2026) Tj
+1 0 0 1 48 684 Tm
+(Currency: USD) Tj
+1 0 0 1 48 669 Tm
+(Description                         Qty x Unit             Line total) Tj
+1 0 0 1 48 654 Tm
+(Printer paper                  4 x      $ 21.12        $ 84.48) Tj
+1 0 0 1 48 639 Tm
+(Replacement cartridges         5 x      $ 42.02       $ 210.10) Tj
+1 0 0 1 48 624 Tm
+(File folders                   5 x      $ 37.35       $ 186.75) Tj
+1 0 0 1 48 609 Tm
+(Replacement cartridges         4 x      $ 90.79       $ 363.16) Tj
+1 0 0 1 48 594 Tm
+(Archive boxes                  4 x      $ 38.93       $ 155.72) Tj
+1 0 0 1 48 579 Tm
+(Desk organizers                3 x      $ 94.65       $ 283.95) Tj
+1 0 0 1 48 564 Tm
+(Desk organizers                2 x      $ 98.92       $ 197.84) Tj
+1 0 0 1 48 549 Tm
+(Printer paper                  3 x      $ 43.77       $ 131.31) Tj
+1 0 0 1 48 534 Tm
+(Subtotal: $ 1,613.31) Tj
+1 0 0 1 48 519 Tm
+(Tax: $ 133.10) Tj
+1 0 0 1 48 504 Tm
+(Total: $ 1,746.41) Tj
+1 0 0 1 48 489 Tm
+(SYNTHETIC TEST DOCUMENT ó NOT A REAL INVOICE) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1611
+%%EOF

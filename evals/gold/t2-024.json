@@ -1,0 +1,63 @@
+{
+  "dedupe_key": "INV-2026-024|westbridge tools|GBP",
+  "doc_foots": false,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "GBP",
+    "invoice_date": "2026-03-19",
+    "invoice_no": "INV-2026-024",
+    "line_items": [
+      {
+        "description": "Packing tape",
+        "line_total": 284.4,
+        "quantity": 2,
+        "unit_price": 142.2
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 343.29,
+        "quantity": 3,
+        "unit_price": 114.43
+      },
+      {
+        "description": "File folders",
+        "line_total": 285.25,
+        "quantity": 5,
+        "unit_price": 57.05
+      },
+      {
+        "description": "Packing tape",
+        "line_total": 357.45,
+        "quantity": 5,
+        "unit_price": 71.49
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 371.3,
+        "quantity": 5,
+        "unit_price": 74.26
+      }
+    ],
+    "subtotal": 1638.94,
+    "tax": 327.79,
+    "total": 1966.73,
+    "vendor": "Westbridge Tools"
+  },
+  "fault": null,
+  "form": {
+    "currency": "GBP",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-024",
+  "label_bucket": "messy",
+  "synthetic": true
+}

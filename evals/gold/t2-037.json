@@ -1,0 +1,57 @@
+{
+  "dedupe_key": "INV-2026-037|harbour and finch|USD",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "review",
+  "expected": {
+    "currency": "USD",
+    "invoice_date": null,
+    "invoice_no": "INV-2026-037",
+    "line_items": [
+      {
+        "description": "File folders",
+        "line_total": 128.74,
+        "quantity": 2,
+        "unit_price": 64.37
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 189.36,
+        "quantity": 4,
+        "unit_price": 47.34
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 509.16,
+        "quantity": 4,
+        "unit_price": 127.29
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 84.36,
+        "quantity": 3,
+        "unit_price": 28.12
+      }
+    ],
+    "subtotal": 911.62,
+    "tax": 75.21,
+    "total": 986.83,
+    "vendor": "Harbour & Finch Ltd."
+  },
+  "fault": null,
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "missing_field",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-037",
+  "label_bucket": "missing_field",
+  "synthetic": true
+}

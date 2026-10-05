@@ -1,0 +1,51 @@
+{
+  "dedupe_key": "INV-2026-048|silverline packaging|GBP",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "rejected",
+  "expected": {
+    "currency": "GBP",
+    "invoice_date": "2026-03-10",
+    "invoice_no": "INV-2026-048",
+    "line_items": [
+      {
+        "description": "Replacement cartridges",
+        "line_total": 451.12,
+        "quantity": 4,
+        "unit_price": 112.78
+      },
+      {
+        "description": "File folders",
+        "line_total": 85.62,
+        "quantity": 1,
+        "unit_price": 85.62
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 73.14,
+        "quantity": 1,
+        "unit_price": 73.14
+      }
+    ],
+    "subtotal": 609.88,
+    "tax": 50.32,
+    "total": 660.2,
+    "vendor": "Silverline Packaging"
+  },
+  "fault": null,
+  "form": {
+    "currency": "GBP",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "oversized",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-048",
+  "label_bucket": "oversized",
+  "synthetic": true
+}

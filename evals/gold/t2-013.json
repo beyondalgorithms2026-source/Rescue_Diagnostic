@@ -1,0 +1,63 @@
+{
+  "dedupe_key": "INV-2026-013|kingswell stationery|USD",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "USD",
+    "invoice_date": "2026-03-13",
+    "invoice_no": "INV-2026-013",
+    "line_items": [
+      {
+        "description": "File folders",
+        "line_total": 201.78,
+        "quantity": 3,
+        "unit_price": 67.26
+      },
+      {
+        "description": "File folders",
+        "line_total": 208.56,
+        "quantity": 3,
+        "unit_price": 69.52
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 810.55,
+        "quantity": 5,
+        "unit_price": 162.11
+      },
+      {
+        "description": "File folders",
+        "line_total": 25.45,
+        "quantity": 5,
+        "unit_price": 5.09
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 183.0,
+        "quantity": 2,
+        "unit_price": 91.5
+      }
+    ],
+    "subtotal": 1429.34,
+    "tax": 117.92,
+    "total": 1547.26,
+    "vendor": "Kingswell Stationery"
+  },
+  "fault": null,
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-013",
+  "label_bucket": "clean",
+  "synthetic": true
+}

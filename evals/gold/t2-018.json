@@ -1,0 +1,51 @@
+{
+  "dedupe_key": "INV-2026-018|silverline packaging|GBP",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "GBP",
+    "invoice_date": "2026-03-01",
+    "invoice_no": "INV-2026-018",
+    "line_items": [
+      {
+        "description": "Printer paper",
+        "line_total": 318.96,
+        "quantity": 4,
+        "unit_price": 79.74
+      },
+      {
+        "description": "Shipping labels",
+        "line_total": 103.16,
+        "quantity": 1,
+        "unit_price": 103.16
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 54.8,
+        "quantity": 4,
+        "unit_price": 13.7
+      }
+    ],
+    "subtotal": 476.92,
+    "tax": 95.38,
+    "total": 572.3,
+    "vendor": "Silverline Packaging"
+  },
+  "fault": null,
+  "form": {
+    "currency": "GBP",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-018",
+  "label_bucket": "messy",
+  "synthetic": true
+}

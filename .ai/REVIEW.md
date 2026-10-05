@@ -1,9 +1,11 @@
-Changed: `src/fixtures/pdfwriter.py`, `src/fixtures/make_inputs.py`, `tests/test_fixtures.py`, `specs/t2-rescue/tasks.md`, `.ai/HANDOFF.md`, `.ai/STATUS.md`, `.ai/REVIEW.md`.
-Did: T3 adds a seeded generator for 14 clean and 12 messy synthetic invoices.
-Did-not: T4 inputs and the n8n extraction smoke test remain for later tasks.
-Check: 13 tests passed. Compileall passed. Secret grep clean. Pdfinfo read one generated PDF.
-Risk: n8n Extract From File smoke test waits until T6.
-Next: T4.
+Changed: `src/fixtures/make_inputs.py`, `tests/test_fixtures.py`, `evals/inputs/`, `evals/gold/`, `specs/t2-rescue/tasks.md`, `.ai/HANDOFF.md`, `.ai/STATUS.md`, `.ai/REVIEW.md`.
+Did: T4 generated 50 PDF and gold pairs and a 50-row manifest.
+Did-not: T5, `docs/DECISIONS.md`, and the existing `.ai/QUESTIONS.md` change.
+Check: Unit tests passed (13); compileall passed; secret grep matched only test literals; strict check awaits the T9 workflow.
+Risk: n8n PDF extraction awaits the T6 smoke test.
+Next: T5.
 ```mermaid
-graph LR; G[Gold JSON] --> P[PDF]; G --> M[Manifest]
+flowchart LR
+gold --> render --> PDF
+gold --> manifest
 ```

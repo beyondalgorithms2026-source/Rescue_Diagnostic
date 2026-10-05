@@ -1,0 +1,57 @@
+{
+  "dedupe_key": "INV-2026-006|harbour and finch|GBP",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "GBP",
+    "invoice_date": "2026-03-19",
+    "invoice_no": "INV-2026-006",
+    "line_items": [
+      {
+        "description": "Shipping labels",
+        "line_total": 354.27,
+        "quantity": 3,
+        "unit_price": 118.09
+      },
+      {
+        "description": "File folders",
+        "line_total": 572.1,
+        "quantity": 5,
+        "unit_price": 114.42
+      },
+      {
+        "description": "Packing tape",
+        "line_total": 201.65,
+        "quantity": 5,
+        "unit_price": 40.33
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 198.94,
+        "quantity": 2,
+        "unit_price": 99.47
+      }
+    ],
+    "subtotal": 1326.96,
+    "tax": 109.47,
+    "total": 1436.43,
+    "vendor": "Harbour & Finch Ltd."
+  },
+  "fault": null,
+  "form": {
+    "currency": "GBP",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-006",
+  "label_bucket": "clean",
+  "synthetic": true
+}

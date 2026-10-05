@@ -1,0 +1,63 @@
+{
+  "dedupe_key": "INV-2026-020|northstar office supply|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-07",
+    "invoice_no": "INV-2026-020",
+    "line_items": [
+      {
+        "description": "Desk organizers",
+        "line_total": 104.1,
+        "quantity": 2,
+        "unit_price": 52.05
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 276.12,
+        "quantity": 3,
+        "unit_price": 92.04
+      },
+      {
+        "description": "File folders",
+        "line_total": 203.4,
+        "quantity": 5,
+        "unit_price": 40.68
+      },
+      {
+        "description": "File folders",
+        "line_total": 532.56,
+        "quantity": 4,
+        "unit_price": 133.14
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 75.2,
+        "quantity": 2,
+        "unit_price": 37.6
+      }
+    ],
+    "subtotal": 1191.38,
+    "tax": 238.28,
+    "total": 1429.66,
+    "vendor": "Northstar Office Supply"
+  },
+  "fault": null,
+  "form": {
+    "currency": "GBP",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-020",
+  "label_bucket": "messy",
+  "synthetic": true
+}

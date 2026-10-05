@@ -1,0 +1,57 @@
+{
+  "dedupe_key": "INV-2026-007|cedar ridge components|USD",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "USD",
+    "invoice_date": "2026-03-22",
+    "invoice_no": "INV-2026-007",
+    "line_items": [
+      {
+        "description": "Packing tape",
+        "line_total": 272.74,
+        "quantity": 2,
+        "unit_price": 136.37
+      },
+      {
+        "description": "File folders",
+        "line_total": 26.05,
+        "quantity": 5,
+        "unit_price": 5.21
+      },
+      {
+        "description": "Shipping labels",
+        "line_total": 150.12,
+        "quantity": 3,
+        "unit_price": 50.04
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 430.85,
+        "quantity": 5,
+        "unit_price": 86.17
+      }
+    ],
+    "subtotal": 879.76,
+    "tax": 72.58,
+    "total": 952.34,
+    "vendor": "Cedar Ridge Components"
+  },
+  "fault": null,
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-007",
+  "label_bucket": "clean",
+  "synthetic": true
+}

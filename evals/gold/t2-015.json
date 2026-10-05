@@ -1,0 +1,45 @@
+{
+  "dedupe_key": "INV-2026-015|acme|GBP",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "GBP",
+    "invoice_date": "2026-03-19",
+    "invoice_no": "INV-2026-015",
+    "line_items": [
+      {
+        "description": "Printer paper",
+        "line_total": 217.36,
+        "quantity": 2,
+        "unit_price": 108.68
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 111.11,
+        "quantity": 1,
+        "unit_price": 111.11
+      }
+    ],
+    "subtotal": 328.47,
+    "tax": 65.69,
+    "total": 394.16,
+    "vendor": "Acme Co. Inc."
+  },
+  "fault": null,
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-015",
+  "label_bucket": "messy",
+  "synthetic": true
+}

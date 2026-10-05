@@ -1,0 +1,32 @@
+{
+  "dedupe_key": "INV-2026-039|westbridge tools|GBP",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "rejected",
+  "expected": {
+    "currency": "GBP",
+    "invoice_date": "2026-03-10",
+    "invoice_no": "INV-2026-039",
+    "line_items": [],
+    "subtotal": 270.28,
+    "tax": 22.3,
+    "total": 292.58,
+    "vendor": "Westbridge Tools"
+  },
+  "fault": null,
+  "form": {
+    "currency": "GBP",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "missing_field",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-039",
+  "label_bucket": "missing_field",
+  "synthetic": true
+}

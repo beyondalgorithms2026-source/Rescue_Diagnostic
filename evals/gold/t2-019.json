@@ -1,0 +1,51 @@
+{
+  "dedupe_key": "INV-2026-019|kingswell stationery|USD",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "USD",
+    "invoice_date": "2026-03-04",
+    "invoice_no": "INV-2026-019",
+    "line_items": [
+      {
+        "description": "Workshop gloves",
+        "line_total": 533.68,
+        "quantity": 4,
+        "unit_price": 133.42
+      },
+      {
+        "description": "Packing tape",
+        "line_total": 347.58,
+        "quantity": 2,
+        "unit_price": 173.79
+      },
+      {
+        "description": "Packing tape",
+        "line_total": 52.15,
+        "quantity": 1,
+        "unit_price": 52.15
+      }
+    ],
+    "subtotal": 933.41,
+    "tax": 77.01,
+    "total": 1010.42,
+    "vendor": "Kingswell Stationery"
+  },
+  "fault": null,
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-019",
+  "label_bucket": "messy",
+  "synthetic": true
+}

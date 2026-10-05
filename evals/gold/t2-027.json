@@ -1,0 +1,63 @@
+{
+  "dedupe_key": "INV-2026-001|westbridge tools|USD",
+  "doc_foots": true,
+  "duplicate_of": "t2-001",
+  "expect_outcome": "duplicate_skip",
+  "expected": {
+    "currency": "USD",
+    "invoice_date": "2026-03-04",
+    "invoice_no": "INV-2026-001",
+    "line_items": [
+      {
+        "description": "Shipping labels",
+        "line_total": 219.48,
+        "quantity": 4,
+        "unit_price": 54.87
+      },
+      {
+        "description": "Shipping labels",
+        "line_total": 876.3,
+        "quantity": 5,
+        "unit_price": 175.26
+      },
+      {
+        "description": "File folders",
+        "line_total": 40.86,
+        "quantity": 1,
+        "unit_price": 40.86
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 487.25,
+        "quantity": 5,
+        "unit_price": 97.45
+      },
+      {
+        "description": "Archive boxes",
+        "line_total": 514.68,
+        "quantity": 4,
+        "unit_price": 128.67
+      }
+    ],
+    "subtotal": 2138.57,
+    "tax": 176.43,
+    "total": 2315.0,
+    "vendor": "Westbridge Tools"
+  },
+  "fault": null,
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "duplicate",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-027",
+  "label_bucket": "duplicate",
+  "synthetic": true
+}

@@ -1,0 +1,39 @@
+{
+  "dedupe_key": "INV-2026-023|kingswell stationery|EUR",
+  "doc_foots": false,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-16",
+    "invoice_no": "INV-2026-023",
+    "line_items": [
+      {
+        "description": "File folders",
+        "line_total": 314.8,
+        "quantity": 5,
+        "unit_price": 62.96
+      }
+    ],
+    "subtotal": 312.05,
+    "tax": 62.41,
+    "total": 374.46,
+    "vendor": "Kingswell Stationery"
+  },
+  "fault": null,
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-023",
+  "label_bucket": "messy",
+  "synthetic": true
+}

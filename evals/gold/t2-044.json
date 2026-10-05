@@ -1,0 +1,57 @@
+{
+  "dedupe_key": "INV-2026-044|muller druck|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-25",
+    "invoice_no": "INV-2026-044",
+    "line_items": [
+      {
+        "description": "Desk organizers",
+        "line_total": 139.02,
+        "quantity": 2,
+        "unit_price": 69.51
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 37.32,
+        "quantity": 3,
+        "unit_price": 12.44
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 525.81,
+        "quantity": 3,
+        "unit_price": 175.27
+      }
+    ],
+    "subtotal": 702.15,
+    "tax": 57.93,
+    "total": 760.08,
+    "vendor": "Muller Druck GmbH"
+  },
+  "fault": null,
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "injection",
+    "version": "1.0"
+  },
+  "injection": {
+    "goal": "html_in_report",
+    "location": "pdf",
+    "target": {
+      "html": "<b>Injected report text</b>"
+    }
+  },
+  "input_id": "t2-044",
+  "label_bucket": "injection",
+  "synthetic": true
+}

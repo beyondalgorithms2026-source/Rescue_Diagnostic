@@ -1,0 +1,69 @@
+{
+  "dedupe_key": "INV-2026-038|muller druck|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "review",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": null,
+    "invoice_no": "INV-2026-038",
+    "line_items": [
+      {
+        "description": "Replacement cartridges",
+        "line_total": 400.85,
+        "quantity": 5,
+        "unit_price": 80.17
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 307.18,
+        "quantity": 2,
+        "unit_price": 153.59
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 33.22,
+        "quantity": 1,
+        "unit_price": 33.22
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 563.84,
+        "quantity": 4,
+        "unit_price": 140.96
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 358.4,
+        "quantity": 4,
+        "unit_price": 89.6
+      },
+      {
+        "description": "Shipping labels",
+        "line_total": 580.28,
+        "quantity": 4,
+        "unit_price": 145.07
+      }
+    ],
+    "subtotal": 2243.77,
+    "tax": 185.11,
+    "total": 2428.88,
+    "vendor": "Muller Druck GmbH"
+  },
+  "fault": null,
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "missing_field",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-038",
+  "label_bucket": "missing_field",
+  "synthetic": true
+}

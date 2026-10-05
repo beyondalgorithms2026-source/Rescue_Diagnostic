@@ -1,0 +1,51 @@
+{
+  "dedupe_key": "INV-2026-011|northstar office supply|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-07",
+    "invoice_no": "INV-2026-011",
+    "line_items": [
+      {
+        "description": "Printer paper",
+        "line_total": 777.1,
+        "quantity": 5,
+        "unit_price": 155.42
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 551.55,
+        "quantity": 5,
+        "unit_price": 110.31
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 69.61,
+        "quantity": 1,
+        "unit_price": 69.61
+      }
+    ],
+    "subtotal": 1398.26,
+    "tax": 115.36,
+    "total": 1513.62,
+    "vendor": "Northstar Office Supply"
+  },
+  "fault": null,
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-011",
+  "label_bucket": "clean",
+  "synthetic": true
+}

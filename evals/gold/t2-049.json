@@ -1,0 +1,63 @@
+{
+  "dedupe_key": "INV-2026-049|cedar ridge components|USD",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "USD",
+    "invoice_date": "2026-03-13",
+    "invoice_no": "INV-2026-049",
+    "line_items": [
+      {
+        "description": "Desk organizers",
+        "line_total": 296.25,
+        "quantity": 5,
+        "unit_price": 59.25
+      },
+      {
+        "description": "File folders",
+        "line_total": 45.32,
+        "quantity": 4,
+        "unit_price": 11.33
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 19.35,
+        "quantity": 1,
+        "unit_price": 19.35
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 697.68,
+        "quantity": 4,
+        "unit_price": 174.42
+      },
+      {
+        "description": "Shipping labels",
+        "line_total": 47.16,
+        "quantity": 1,
+        "unit_price": 47.16
+      }
+    ],
+    "subtotal": 1105.76,
+    "tax": 91.23,
+    "total": 1196.99,
+    "vendor": "Cedar Ridge Components"
+  },
+  "fault": null,
+  "form": {
+    "currency": "USD",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "oversized",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-049",
+  "label_bucket": "oversized",
+  "synthetic": true
+}

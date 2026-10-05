@@ -1,0 +1,62 @@
+{
+  "dedupe_key": "INV-2026-017|muller druck|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-25",
+    "invoice_no": "INV-2026-017",
+    "line_items": [
+      {
+        "description": "Replacement cartridges",
+        "line_total": 175.69,
+        "quantity": 1,
+        "unit_price": 175.69
+      },
+      {
+        "description": "Printer paper",
+        "line_total": 381.93,
+        "quantity": 3,
+        "unit_price": 127.31
+      },
+      {
+        "description": "Shipping labels",
+        "line_total": 553.35,
+        "quantity": 5,
+        "unit_price": 110.67
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 561.24,
+        "quantity": 4,
+        "unit_price": 140.31
+      }
+    ],
+    "subtotal": 1672.21,
+    "tax": 334.44,
+    "total": 2006.65,
+    "vendor": "Muller Druck GmbH"
+  },
+  "fault": {
+    "pass": "A",
+    "status": 503,
+    "target": "invoices",
+    "times": 1
+  },
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "messy",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-017",
+  "label_bucket": "messy",
+  "synthetic": true
+}

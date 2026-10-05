@@ -1,0 +1,61 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 777 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 48 744 Tm
+(INVOICE) Tj
+1 0 0 1 48 729 Tm
+(Invoice number: INV-2026-002) Tj
+1 0 0 1 48 714 Tm
+(Vendor: Muller Druck GmbH) Tj
+1 0 0 1 48 699 Tm
+(Invoice date: 2026-03-07) Tj
+1 0 0 1 48 684 Tm
+(Currency: EUR) Tj
+1 0 0 1 48 669 Tm
+(Description                         Qty x Unit             Line total) Tj
+1 0 0 1 48 654 Tm
+(File folders                   3 x   EUR 137.25     EUR 411.75) Tj
+1 0 0 1 48 639 Tm
+(File folders                   3 x   EUR 127.20     EUR 381.60) Tj
+1 0 0 1 48 624 Tm
+(Replacement cartridges         3 x    EUR 53.57     EUR 160.71) Tj
+1 0 0 1 48 609 Tm
+(Subtotal: EUR 954.06) Tj
+1 0 0 1 48 594 Tm
+(Tax: EUR 78.71) Tj
+1 0 0 1 48 579 Tm
+(Total: EUR 1,032.77) Tj
+1 0 0 1 48 564 Tm
+(SYNTHETIC TEST DOCUMENT ó NOT A REAL INVOICE) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1171
+%%EOF

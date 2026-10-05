@@ -1,0 +1,51 @@
+{
+  "dedupe_key": "INV-2026-047|harbour and finch|EUR",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "rejected",
+  "expected": {
+    "currency": "EUR",
+    "invoice_date": "2026-03-07",
+    "invoice_no": "INV-2026-047",
+    "line_items": [
+      {
+        "description": "Workshop gloves",
+        "line_total": 83.44,
+        "quantity": 1,
+        "unit_price": 83.44
+      },
+      {
+        "description": "Replacement cartridges",
+        "line_total": 83.79,
+        "quantity": 1,
+        "unit_price": 83.79
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 315.6,
+        "quantity": 4,
+        "unit_price": 78.9
+      }
+    ],
+    "subtotal": 482.83,
+    "tax": 39.83,
+    "total": 522.66,
+    "vendor": "Harbour & Finch Ltd."
+  },
+  "fault": null,
+  "form": {
+    "currency": "EUR",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "oversized",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-047",
+  "label_bucket": "oversized",
+  "synthetic": true
+}

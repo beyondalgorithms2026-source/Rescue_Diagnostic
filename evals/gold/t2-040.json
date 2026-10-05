@@ -1,0 +1,51 @@
+{
+  "dedupe_key": null,
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "review",
+  "expected": {
+    "currency": null,
+    "invoice_date": "2026-03-13",
+    "invoice_no": "INV-2026-040",
+    "line_items": [
+      {
+        "description": "Desk organizers",
+        "line_total": 28.53,
+        "quantity": 1,
+        "unit_price": 28.53
+      },
+      {
+        "description": "Desk organizers",
+        "line_total": 299.46,
+        "quantity": 2,
+        "unit_price": 149.73
+      },
+      {
+        "description": "Workshop gloves",
+        "line_total": 290.88,
+        "quantity": 3,
+        "unit_price": 96.96
+      }
+    ],
+    "subtotal": 618.87,
+    "tax": 51.06,
+    "total": 669.93,
+    "vendor": "Silverline Packaging"
+  },
+  "fault": null,
+  "form": {
+    "currency": "",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "missing_field",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-040",
+  "label_bucket": "missing_field",
+  "synthetic": true
+}

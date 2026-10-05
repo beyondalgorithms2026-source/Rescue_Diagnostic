@@ -1,0 +1,69 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1127 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 48 744 Tm
+(INVOICE) Tj
+1 0 0 1 48 729 Tm
+(Invoice number: INV-2026-008) Tj
+1 0 0 1 48 714 Tm
+(Vendor: Silverline Packaging) Tj
+1 0 0 1 48 699 Tm
+(Invoice date: 2026-03-25) Tj
+1 0 0 1 48 684 Tm
+(Currency: GBP) Tj
+1 0 0 1 48 669 Tm
+(Description                         Qty x Unit             Line total) Tj
+1 0 0 1 48 654 Tm
+(Replacement cartridges         3 x   GBP 163.20     GBP 489.60) Tj
+1 0 0 1 48 639 Tm
+(Replacement cartridges         3 x    GBP 28.53      GBP 85.59) Tj
+1 0 0 1 48 624 Tm
+(Replacement cartridges         5 x    GBP 87.27     GBP 436.35) Tj
+1 0 0 1 48 609 Tm
+(Packing tape                   1 x   GBP 103.21     GBP 103.21) Tj
+1 0 0 1 48 594 Tm
+(Archive boxes                  3 x   GBP 148.92     GBP 446.76) Tj
+1 0 0 1 48 579 Tm
+(Desk organizers                1 x   GBP 134.77     GBP 134.77) Tj
+1 0 0 1 48 564 Tm
+(Packing tape                   3 x   GBP 154.92     GBP 464.76) Tj
+1 0 0 1 48 549 Tm
+(Subtotal: GBP 2,161.04) Tj
+1 0 0 1 48 534 Tm
+(Tax: GBP 178.29) Tj
+1 0 0 1 48 519 Tm
+(Total: GBP 2,339.33) Tj
+1 0 0 1 48 504 Tm
+(SYNTHETIC TEST DOCUMENT ó NOT A REAL INVOICE) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1522
+%%EOF

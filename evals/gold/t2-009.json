@@ -1,0 +1,44 @@
+{
+  "dedupe_key": "INV-2026-009|kingswell stationery|GBP",
+  "doc_foots": true,
+  "duplicate_of": null,
+  "expect_outcome": "committed",
+  "expected": {
+    "currency": "GBP",
+    "invoice_date": "2026-03-01",
+    "invoice_no": "INV-2026-009",
+    "line_items": [
+      {
+        "description": "File folders",
+        "line_total": 168.34,
+        "quantity": 1,
+        "unit_price": 168.34
+      }
+    ],
+    "subtotal": 168.34,
+    "tax": 13.89,
+    "total": 182.23,
+    "vendor": "Kingswell Stationery"
+  },
+  "fault": {
+    "pass": "A",
+    "status": 503,
+    "target": "line_items",
+    "times": 1
+  },
+  "form": {
+    "currency": "GBP",
+    "email": "ap@example.com",
+    "name": "Synthetic Accounts Payable",
+    "notes": ""
+  },
+  "generator": {
+    "seed": 20261005,
+    "template": "clean",
+    "version": "1.0"
+  },
+  "injection": null,
+  "input_id": "t2-009",
+  "label_bucket": "clean",
+  "synthetic": true
+}
