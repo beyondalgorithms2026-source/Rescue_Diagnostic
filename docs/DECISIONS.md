@@ -39,3 +39,8 @@ Consequences:
 - Callers without a run id get a fresh run_id per request, so per-run cap bounds little outside the replay; findings state that production should key the cap by calendar day or by credential.
 - `est_usd` before the call uses `ceil(chars/3)` input tokens + `MAX_OUTPUT_TOKENS`; conservative, may refuse slightly early.
 - Changing the cap unit (per day, per tenant) is a new ADR.
+
+
+ADR-001: Accepted 2026-10-06. Append-only sink. Idempotency stays in the workflow. Dedupe key stays invoice_no_norm | vendor_norm | currency. The two duplicate traps stay committed, not skipped.
+
+ADR-002: Accepted 2026-10-06, with an owner override. Per-run cap is $0.25, not $2.00. About 4 runs, so the project ceiling is $1. Do not raise the cap without asking. The as-published baseline costs $0 because it never calls OpenAI.

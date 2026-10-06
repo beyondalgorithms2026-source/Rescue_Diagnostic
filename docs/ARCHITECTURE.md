@@ -64,6 +64,8 @@ and n8n Cloud does not offer custom env vars.
 Which target produced a run is recorded in `summary.json` (`target`, `n8n_version`) and in the cost ledger.
 Both run_ids in the committed scorecard must come from the **same** target; default is `online`.
 
+Scored runs are local Docker n8nio/n8n:2.22.5 only. No online target. Recreate the container on that pinned tag yourself before T8. Codex must not pull latest.
+
 ---
 
 ## 1. Repository layout (target state)

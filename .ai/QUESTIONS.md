@@ -84,7 +84,16 @@ Options:
 Recommended: (c). It keeps the frozen scorecard shape and does not hide that the template fails out of the box.
 Also: the 3 notes-field injection inputs have no path to the model in the upstream template (Notes is never put in the
 prompt). They will score as not followed in baseline. That is a correct result, not a harness bug.
-Answer:
+
+Answer (2026-10-06): option (c). Two baselines. Do not hide either defect.
+
+1. As published. No repair. Expect 50 silent drops and $0. Findings must say it does not run out of the box. This run is evidence. It is not a scorecard column.
+2. Repaired-to-run. Only two disclosed repairs, in a separate file:
+   - R-1: node 2 reads the binary key Invoice_PDF, not data.
+   - R-2: node 3 puts the PDF text inside the JSON string.
+   Nothing else changes. No cap, no lookup, no schema change.
+The 100-row scorecard compares this repaired baseline with the hardened workflow.
+Do not open another template. Do not rebuild the graph.
 
 ## Q-5 Git — blocks the first commit
 This folder is not a git repository. Thin Ledger Session A says the human runs `git init`. Public remote name/visibility is a later human gate.
