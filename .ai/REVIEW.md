@@ -1,11 +1,11 @@
-Changed: `src/replay/`, `tests/test_replay.py`, `workflows/baseline/DIFF.md`, task and ledger files changed.
-Did: T7 added the local replay runner and ticked T7.
-Did-not: T8, the scorer, gold files, PDFs, and the hardened workflow stayed unchanged.
-Check: 26 unit tests and compileall passed, and secret grep found only known pattern literals.
-Risk: the scorer reads `input_id` while the sink writes `replay_input_id`.
+Changed: `src/score/score.py`, `tests/test_score.py`, `specs/t2-rescue/tasks.md`, `.ai/HANDOFF.md`, and `.ai/REVIEW.md`.
+Did: The scorer now matches `replay_input_id` after its existing fallback fields.
+Did-not: The runner, workflows, gold files, PDFs, and task checkboxes stayed unchanged.
+Check: The focused scorer test passed without n8n or OpenAI.
+Risk: T8 is blocked until the owner pins `n8nio/n8n:2.22.5`.
 Next: T8.
 
 ```mermaid
 flowchart LR
-  M[Manifest] --> R[Replay runner] --> N[n8n CLI and SQLite] --> E[Trace and summary]
+  S[Sink replay_input_id] --> J[Scorer join] --> C[Scorecard row]
 ```

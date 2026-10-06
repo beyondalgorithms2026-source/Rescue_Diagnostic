@@ -100,7 +100,8 @@ def _load_run(run_dir):
 
 
 def _attr(row, input_id):
-    return row.get("input_id") == input_id or row.get("input_ref") == input_id or row.get("active_input") == input_id
+    return (row.get("input_id") == input_id or row.get("input_ref") == input_id or
+            row.get("active_input") == input_id or row.get("replay_input_id") == input_id)
 
 
 def _hat_row(tables, input_id, phase):
