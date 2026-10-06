@@ -65,4 +65,17 @@ What this shows:
    outside the JSON string, so the body is never valid JSON, for any input.
 3. "Extract From File" reads a T3 fixture PDF: shown by the probe, which passed node 2 with the key corrected.
 
-How to score a template that cannot reach its LLM is an owner decision: QUESTIONS Q-7.
+## Q-7 replay variants (owner decision, 2026-10-06)
+
+The runner records two baseline variants.  The as-published variant uses this equivalent unchanged and is evidence only.
+It has no repair, makes no LLM call, and is not a scorecard column.
+
+The repaired-to-run variant is the separate generated file
+`workflows/baseline/upstream/16643-repaired-to-run.json`.  It applies only these two repairs:
+
+| Repair | JSON path | Change |
+|---|---|---|
+| R-1 | `nodes[name=2. Extract From File — PDF to Text].parameters.binaryPropertyName` | `data` → `Invoice_PDF` |
+| R-2 | `nodes[name=3. HTTP — AI Extract Invoice Fields].parameters.jsonBody` | Move the extracted PDF text inside `JSON.stringify(...)` so the HTTP JSON body is valid. |
+
+The 100-row scorecard compares this repaired baseline with the hardened workflow.  No other node, cap, lookup, or schema changes in the repaired file.
