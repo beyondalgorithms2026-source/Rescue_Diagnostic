@@ -1,9 +1,9 @@
 # Current handoff
-Task: T7 complete — local replay runner, baseline variants, and fake-n8n tests.
+Task: T8 complete — local repaired baseline run and baseline-only scorecard.
 Branch: main
-Done: `src/replay/run.py` imports through the local n8n CLI, publishes then restarts the container, submits inputs sequentially in passes A/B, reads execution data through read-only SQLite, writes trace, summary, and one cost-ledger row, stops at the $0.25 cap, and unpublishes in `finally`. It starts a fresh local sink for each run. It does not use the public API or an online target. Q-7 repairs are materialized only in the gitignored separate `16643-repaired-to-run.json` file. `DIFF.md` discloses R-1 and R-2.
-Tests / checks run: `python3 -m unittest discover -s tests -t . -v` — 26 tests OK. `compileall` OK. Secret grep found only known test and scanner pattern literals.
-Next task: T8 — local baseline runs and baseline-only scoring, blocked until the owner pins `n8nio/n8n:2.22.5`.
+Done: As-published evidence is execution 447, which stops at node 2 with no sink delivery or OpenAI request. Repaired run `baseline-local-20261007T060333Z-nogit` reached node 3 on all 100 ordered A/B submissions. `evals/scorecard.csv` has 50 baseline rows from that run only. R-2 serializes the complete node-3 request after joining extracted PDF text to the unchanged user prompt. The workflow is unpublished after every replay.
+Tests / checks run: `python3 -m unittest discover -s tests -t . -v` — 29 tests OK. `compileall` OK. Secret grep found only known scanner and test literals.
+Next task: A human reads at least 15 repaired traces and writes trace notes, then T9.
 Read first: AGENTS.md; `.ai/QUESTIONS.md` Q-1, Q-6, Q-7; `docs/ARCHITECTURE.md` §1.1, §4, §5.4–5.5; `specs/t2-rescue/plan.md` §T8; `workflows/baseline/DIFF.md`; `src/replay/run.py`.
-T8 note: Run the as-published baseline as evidence only. Run repaired-to-run as the baseline scorecard phase. The scorecard stays at 100 rows after T11.
-Open risk: the owner must pin `n8nio/n8n:2.22.5` before T8.
+T8 note: The scorecard has baseline rows only until T11 adds the hardened phase.
+Open risk: Node 9, recipient, currency, and lookup findings remain intentionally unfixed.

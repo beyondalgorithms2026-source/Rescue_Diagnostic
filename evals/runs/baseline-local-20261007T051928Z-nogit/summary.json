@@ -1,0 +1,15 @@
+{
+  "run_id": "baseline-local-20261007T051928Z-nogit",
+  "phase": "baseline",
+  "target": "local",
+  "workflow_sha256": "33d3e64774ea479972f05ab6d9d2d761c65a62e49c794c9fee968ad20367ca57",
+  "n8n_version": "2.22.5",
+  "model": "gpt-4o-mini-2024-07-18",
+  "started": "2026-10-07T05:19:28Z",
+  "ended": "2026-10-07T05:19:45Z",
+  "inputs": 1,
+  "passes": "A",
+  "tokens": 0,
+  "usd": 0.0,
+  "capped": 0
+}

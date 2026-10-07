@@ -1,0 +1,3 @@
+run_id,run_phase,target,started_utc,ended_utc,model,llm_calls,tokens_in,tokens_out,usd,run_usd_cap,capped_inputs
+baseline-local-20261007T051928Z-nogit,baseline,local,2026-10-07T05:19:28Z,2026-10-07T05:19:45Z,gpt-4o-mini-2024-07-18,0,0,0,0.0,0.25,0
+baseline-local-20261007T060333Z-nogit,baseline,local,2026-10-07T06:03:33Z,2026-10-07T06:16:51Z,gpt-4o-mini-2024-07-18,100,121316,40435,0.042458399999999986,0.25,0

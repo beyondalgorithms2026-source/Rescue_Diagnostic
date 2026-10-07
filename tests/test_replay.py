@@ -25,6 +25,9 @@ class FakeN8n:
     def unpublish(self, workflow_id):
         self.calls.append(("unpublish", workflow_id))
 
+    def credential_ids(self, names):
+        return {name: "id-" + name for name in names}
+
     def latest_id(self, workflow_id):
         return self.next_id
 
@@ -76,10 +79,12 @@ class ReplayTests(unittest.TestCase):
                "SINK_BASE_URL": "http://sink.invalid", "N8N_BASE_URL": "http://n8n.invalid",
                "LLM_PRICE_IN_PER_MTOK": "0.15", "LLM_PRICE_OUT_PER_MTOK": "0.60", "RUN_USD_CAP": "0.25"}
         seen = []
-        with patch.dict(os.environ, env, clear=True), patch.object(run, "request_json", return_value=(200, {"ok": True})), \
+        sink_urls = []
+        with patch.dict(os.environ, env, clear=True), patch.object(run, "request_json", side_effect=lambda method, url, *_args, **_kwargs: sink_urls.append(url) or (200, {"ok": True})), \
                 patch.object(run, "submit", side_effect=lambda *values: seen.append(values[3]["input_id"]) or 200):
             run_dir = run.run_replay(args, fake)
         self.assertEqual(seen, ["t2-001"])
+        self.assertTrue(all(url.startswith("http://127.0.0.1:8787/") for url in sink_urls))
         self.assertEqual(fake.calls, [("import", "t2BaselineEquiv1"), ("publish", "t2BaselineEquiv1"),
                                       ("unpublish", "t2BaselineEquiv1")])
         events = [json.loads(line) for line in (run_dir / "trace.jsonl").read_text().splitlines()]
@@ -113,13 +118,22 @@ class ReplayTests(unittest.TestCase):
         self.assertIn("--input=/dev/stdin", calls[0][0])
         self.assertEqual([call[0][0:2] for call in calls].count(["docker", "restart"]), 2)
 
+    def test_submit_uses_the_equivalence_shim_binary_key(self):
+        data, _ = run.multipart({}, run.equivalent.FILE_BINARY_KEY, "invoice.pdf", b"pdf", {})
+        self.assertIn(b'name="Invoice_PDF"', data)
+
+    def test_usage_reads_http_response_body(self):
+        value = {"main": [[{"json": {"usage": {"prompt_tokens": 7, "completion_tokens": 3}}}]]}
+        self.assertEqual(run._usage(value), (7, 3))
+
     def test_repairs_are_only_r1_and_r2(self):
         workflow = {"nodes": [{"name": "2. Extract From File — PDF to Text", "parameters": {}},
                               {"name": run.equivalent.LLM, "parameters": {"jsonBody":
-                               "={{ JSON.stringify(\"p\") + $('2. Extract From File — PDF to Text').first().json.text }}"}}]}
+                               "={\"content\": {{ JSON.stringify(\"p\") + $('2. Extract From File — PDF to Text').first().json.text }}\"}"}}]}
         repaired = run.repaired_to_run(workflow)
         self.assertEqual(repaired["nodes"][0]["parameters"]["binaryPropertyName"], "Invoice_PDF")
-        self.assertIn("json.text) }}", repaired["nodes"][1]["parameters"]["jsonBody"])
+        self.assertIn("={{ JSON.stringify({\"content\":(\"p\" + $('2. Extract From File — PDF to Text').first().json.text)}) }}",
+                      repaired["nodes"][1]["parameters"]["jsonBody"])
         self.assertNotIn("binaryPropertyName", workflow["nodes"][0]["parameters"])
         output = self.root / "repaired.json"
         source = self.root / "source.json"

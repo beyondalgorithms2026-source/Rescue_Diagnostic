@@ -76,6 +76,6 @@ The repaired-to-run variant is the separate generated file
 | Repair | JSON path | Change |
 |---|---|---|
 | R-1 | `nodes[name=2. Extract From File — PDF to Text].parameters.binaryPropertyName` | `data` → `Invoice_PDF` |
-| R-2 | `nodes[name=3. HTTP — AI Extract Invoice Fields].parameters.jsonBody` | Move the extracted PDF text inside `JSON.stringify(...)` so the HTTP JSON body is valid. |
+| R-2 | `nodes[name=3. HTTP — AI Extract Invoice Fields].parameters.jsonBody` | Replace the broken inline body interpolation with one `JSON.stringify(...)` expression for the unchanged request object; `messages[1].content` joins the unchanged prompt and extracted PDF text before that object is serialized. |
 
 The 100-row scorecard compares this repaired baseline with the hardened workflow.  No other node, cap, lookup, or schema changes in the repaired file.

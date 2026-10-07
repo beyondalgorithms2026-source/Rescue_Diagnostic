@@ -85,7 +85,7 @@ def submit(webhook_url, token, run_id, item, pdf_path, timeout=TIMEOUT_SECONDS):
     fields = {"Your Name": form.get("name", ""), "Your Email": form.get("email", ""),
               "Currency": form.get("currency", ""), "Notes": form.get("notes", "")}
     headers = {"X-T2-Token": token, "X-Replay-Run-Id": run_id, "X-Replay-Input-Id": item["input_id"]}
-    data, headers = multipart(fields, equivalent.FILE_FIELD, pdf_path.name, pdf_path.read_bytes(), headers)
+    data, headers = multipart(fields, equivalent.FILE_BINARY_KEY, pdf_path.name, pdf_path.read_bytes(), headers)
     try:
         with urlopen(Request(webhook_url, data=data, headers=headers, method="POST"), timeout=timeout) as response:
             return response.status
@@ -103,12 +103,24 @@ def repaired_to_run(workflow):
     extract["parameters"]["binaryPropertyName"] = equivalent.FILE_BINARY_KEY  # R-1
     llm = nodes[equivalent.LLM]
     body = llm["parameters"]["jsonBody"]
-    old = ") + $('2. Extract From File — PDF to Text').first().json.text }}"
-    new = " + $('2. Extract From File — PDF to Text').first().json.text) }}"
-    if old not in body:
+    prefix = '"content": {{ JSON.stringify('
+    suffix = ") + $('2. Extract From File — PDF to Text').first().json.text }}\""
+    if not body.startswith("={") or prefix not in body or suffix not in body:
         raise ValueError("baseline JSON body no longer has the documented R-2 defect")
-    # R-2: preserve the prompt but include extracted PDF text within JSON.stringify().
-    llm["parameters"]["jsonBody"] = body.replace(old, new)
+    raw_body = body[1:]
+    start = raw_body.index(prefix) + len(prefix)
+    end = raw_body.index(suffix, start)
+    prompt = json.loads(raw_body[start:end])
+    marker = "__T2_R2_PDF_TEXT__"
+    payload = json.loads(raw_body.replace(raw_body[start - len(prefix):end + len(suffix)],
+                                          '"content": "{}"'.format(marker), 1))
+    encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    text = "({} + $('2. Extract From File — PDF to Text').first().json.text)".format(
+        json.dumps(prompt, ensure_ascii=False))
+    # R-2: JSON.stringify serializes the complete request object after text joins
+    # its user-content string, so text cannot escape the HTTP JSON body.
+    llm["parameters"]["jsonBody"] = "={{{{ JSON.stringify({}) }}}}".format(
+        encoded.replace(json.dumps(marker), text, 1))
     return repaired
 
 
@@ -149,22 +161,86 @@ class LocalN8n:
                    "unpublish:workflow", "--id=" + workflow_id])
         self._run(["docker", "restart", "n8n"])
 
+    def wait_ready(self, base_url, timeout=30):
+        """Wait for the restarted local n8n HTTP service before one submission."""
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            try:
+                with urlopen(base_url.rstrip("/") + "/healthz", timeout=2) as response:
+                    if response.status == 200:
+                        # The health endpoint can respond before active webhooks register.
+                        self.sleeper(5)
+                        return
+            except (OSError, URLError):
+                pass
+            self.sleeper(0.25)
+        raise RuntimeError("n8n did not become ready after restart")
+
+    def _container_query(self, sql, parameters):
+        """Run a read-only SQLite query inside the local n8n container."""
+        script = """const sqlite3=require('/usr/local/lib/node_modules/n8n/node_modules/sqlite3');
+const input=JSON.parse(process.argv[1]);
+const db=new sqlite3.Database('/home/node/.n8n/database.sqlite', sqlite3.OPEN_READONLY, error => {
+  if (error) throw error;
+  db.all(input.sql, input.parameters, (queryError, rows) => {
+    if (queryError) throw queryError;
+    process.stdout.write(JSON.stringify(rows));
+    db.close();
+  });
+});"""
+        result = self.command(["docker", "exec", "n8n", "node", "-e", script,
+                               json.dumps({"sql": sql, "parameters": parameters})],
+                              text=True, capture_output=True, check=False)
+        if result.returncode:
+            raise RuntimeError("n8n SQLite query failed")
+        return json.loads(result.stdout or "[]")
+
+    def _query(self, sql, parameters):
+        try:
+            with sqlite3.connect("file:{}?mode=ro".format(self.db_path), uri=True) as connection:
+                return connection.execute(sql, parameters).fetchall()
+        except sqlite3.OperationalError:
+            return [tuple(row.values()) for row in self._container_query(sql, parameters)]
+
+    def _decode_execution_data(self, value):
+        """Decode n8n's bundled Flatted execution data without writing to SQLite."""
+        script = """const flatted=require('/usr/local/lib/node_modules/n8n/node_modules/flatted');
+const value=flatted.parse(process.argv[1]);
+process.stdout.write(JSON.stringify(value));"""
+        result = self.command(["docker", "exec", "n8n", "node", "-e", script, value],
+                              text=True, capture_output=True, check=False)
+        if result.returncode:
+            raise RuntimeError("n8n execution-data decode failed")
+        return json.loads(result.stdout)
+
     def latest_id(self, workflow_id):
-        with sqlite3.connect("file:{}?mode=ro".format(self.db_path), uri=True) as connection:
-            row = connection.execute("SELECT MAX(id) FROM execution_entity WHERE workflowId = ?", (workflow_id,)).fetchone()
+        row = self._query("SELECT MAX(id) FROM execution_entity WHERE workflowId = ?", (workflow_id,))[0]
         return int(row[0] or 0)
+
+    def credential_ids(self, names):
+        placeholders = ",".join("?" for _ in names)
+        rows = self._query("SELECT id, name FROM credentials_entity WHERE name IN ({})".format(placeholders),
+                           tuple(names))
+        ids = {row[1]: row[0] for row in rows}
+        missing = set(names) - set(ids)
+        if missing:
+            raise RuntimeError("required local credentials are missing")
+        return ids
 
     def wait_execution(self, workflow_id, after_id, timeout=TIMEOUT_SECONDS):
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
-            with sqlite3.connect("file:{}?mode=ro".format(self.db_path), uri=True) as connection:
-                row = connection.execute(
-                    "SELECT id, status, startedAt, stoppedAt FROM execution_entity "
-                    "WHERE workflowId = ? AND id > ? ORDER BY id DESC LIMIT 1", (workflow_id, after_id)).fetchone()
-                if row and row[1] not in ("new", "running", "waiting"):
-                    data = connection.execute("SELECT data FROM execution_data WHERE executionId = ?", (row[0],)).fetchone()
-                    return {"id": int(row[0]), "status": row[1], "started": row[2], "stopped": row[3],
-                            "data": json.loads(data[0]) if data and data[0] else None}
+            rows = self._query("SELECT id, status, startedAt, stoppedAt FROM execution_entity "
+                               "WHERE workflowId = ? AND id > ? ORDER BY id DESC LIMIT 1",
+                               (workflow_id, after_id))
+            row = rows[0] if rows else None
+            if row and row[1] not in ("new", "running", "waiting"):
+                data_rows = self._query("SELECT data FROM execution_data WHERE executionId = ?", (row[0],))
+                data = data_rows[0] if data_rows else None
+                return {"id": int(row[0]), "status": row[1], "started": row[2], "stopped": row[3],
+                        "data": (self._decode_execution_data(data[0])
+                                 if data and data[0] and data[0].lstrip().startswith("[")
+                                 else json.loads(data[0]) if data and data[0] else None)}
             self.sleeper(0.25)
         return None
 
@@ -204,6 +280,11 @@ class LocalSink:
 def _usage(value):
     if not isinstance(value, dict):
         return 0, 0
+    main = value.get("main")
+    if isinstance(main, list) and main and isinstance(main[0], list) and main[0]:
+        item = main[0][0]
+        if isinstance(item, dict):
+            value = item.get("json", value)
     usage = value.get("usage", value.get("tokenUsage", {}))
     if not isinstance(usage, dict):
         return 0, 0
@@ -256,6 +337,9 @@ def run_replay(args, n8n=None):
     if args.phase == "baseline" and args.baseline_mode == "repaired":
         source = materialize_repaired_baseline(source, Path(args.repaired_workflow))
     workflow = json.loads(source.read_text(encoding="utf-8"))
+    n8n = n8n or LocalN8n(args.sqlite)
+    credential_names = tuple(name for _, name in equivalent.CREDENTIALS.values())
+    workflow = equivalent.bind_credentials(workflow, n8n.credential_ids(credential_names))
     workflow = equivalent.substitute(workflow, env["SINK_BASE_URL"], env["T2_WEBHOOK_PATH_BASELINE"])
     workflow_sha = hashlib.sha256(source.read_bytes()).hexdigest()
     run_id = "{}-local-{}-{}".format(args.phase, datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), "nogit")
@@ -263,19 +347,22 @@ def run_replay(args, n8n=None):
     run_dir.mkdir(parents=True)
     trace_path = run_dir / "trace.jsonl"
     started = utc_now()
-    n8n = n8n or LocalN8n(args.sqlite)
     sink_process = None
     if getattr(args, "start_sink", True):
         sink_process = LocalSink(run_dir / "sink", env["SINK_TOKEN"], int(env.get("SINK_PORT", "8787")))
         sink_process.start()
     webhook = env["N8N_BASE_URL"].rstrip("/") + "/webhook/" + env["T2_WEBHOOK_PATH_BASELINE"]
-    sink = env["SINK_BASE_URL"].rstrip("/")
+    # The workflow runs in Docker and uses SINK_BASE_URL.  The runner runs on
+    # the host, where its freshly started sink is reachable on loopback.
+    sink = "http://127.0.0.1:{}".format(env.get("SINK_PORT", "8787"))
     rows, total_usd, capped, published = load_manifest(args.manifest), 0.0, 0, False
     all_events = []
     try:
         n8n.import_workflow(workflow)
         published = True
         n8n.publish(workflow["id"])
+        if isinstance(n8n, LocalN8n):
+            n8n.wait_ready(env["N8N_BASE_URL"])
         for pass_name in args.passes:
             for row in rows:
                 if total_usd >= RUN_CAP:
@@ -293,7 +380,10 @@ def run_replay(args, n8n=None):
                 if fault and fault.get("pass") == pass_name:
                     request_json("POST", sink + "/_replay/fault", env["SINK_TOKEN"], fault)
                 before = n8n.latest_id(workflow["id"])
-                submit(webhook, env["T2_WEBHOOK_TOKEN"], run_id, gold, Path(args.inputs_dir) / row["filename"])
+                response_status = submit(webhook, env["T2_WEBHOOK_TOKEN"], run_id, gold,
+                                         Path(args.inputs_dir) / row["filename"])
+                if response_status < 200 or (400 <= response_status < 500):
+                    raise RuntimeError("webhook submission returned HTTP {}".format(response_status))
                 execution = n8n.wait_execution(workflow["id"], before)
                 events = trace_events(execution, run_id, pass_name, row["input_id"], price_in, price_out)
                 all_events.extend(events)
