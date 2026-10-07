@@ -1,14 +1,11 @@
-Changed: R-2, the replay runner, T8 records, the repaired run, and the baseline scorecard changed.
-Did: T8 completed with a repaired run whose 100 submissions reached node 3.
-Did-not: The as-published workflow, scorer, gold data, PDFs, and T9 stayed unchanged.
-Check: The repaired scorecard has 50 rows from `baseline-local-20261007T060333Z-nogit`.
-Risk: Node 9, recipient, currency, and lookup findings remain unfixed.
-Next: A human reads 15 traces, then starts T9.
-
+Changed: workflows/hardened/t2-hardened.json, workflows/hardened/t2-error-handler.json, specs/t2-rescue/tasks.md, .ai/HANDOFF.md, .ai/STATUS.md, and .ai/REVIEW.md changed.
+Did: T9 adds guarded intake, extraction caps, DeepSeek extraction, and ledger writes.
+Did-not: Baseline workflows, scorecard data, findings, and T10 nodes were left alone.
+Check: 29 tests, compile, and strict static checks passed; secret grep found only scanner and test literals.
+Risk: The fake-endpoint error drill is deferred to T10.
+Next: T10.
 ```mermaid
 flowchart LR
-  PDF[t2-001 PDF] --> R2[R-2 JSON body]
-  R2 --> N3[Node 3 request]
-  N3 --> Run[Repaired run]
-  Run --> Score[Baseline scorecard]
+  Intake[H1 intake] --> Hash[H2 hash and duplicate lookup] --> Extract[H3-H4 extract and text cap] --> Gate[H5 spend and rate gate] --> LLM[H6 DeepSeek] --> Ledger[H7 ledger]
+  LLM --> Error[Error handler]
 ```

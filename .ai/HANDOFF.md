@@ -1,9 +1,29 @@
 # Current handoff
-Task: T8 complete — local repaired baseline run and baseline-only scorecard.
-Branch: main
-Done: As-published evidence is execution 447, which stops at node 2 with no sink delivery or OpenAI request. Repaired run `baseline-local-20261007T060333Z-nogit` reached node 3 on all 100 ordered A/B submissions. `evals/scorecard.csv` has 50 baseline rows from that run only. R-2 serializes the complete node-3 request after joining extracted PDF text to the unchanged user prompt. The workflow is unpublished after every replay.
-Tests / checks run: `python3 -m unittest discover -s tests -t . -v` — 29 tests OK. `compileall` OK. Secret grep found only known scanner and test literals.
-Next task: A human reads at least 15 repaired traces and writes trace notes, then T9.
-Read first: AGENTS.md; `.ai/QUESTIONS.md` Q-1, Q-6, Q-7; `docs/ARCHITECTURE.md` §1.1, §4, §5.4–5.5; `specs/t2-rescue/plan.md` §T8; `workflows/baseline/DIFF.md`; `src/replay/run.py`.
-T8 note: The scorecard has baseline rows only until T11 adds the hardened phase.
-Open risk: Node 9, recipient, currency, and lookup findings remain intentionally unfixed.
+Task: T9 complete — hardened intake through ledger workflow files.
+Commit: `d56a569 Complete T8 repaired baseline replay`.
+
+Done:
+- `workflows/hardened/t2-hardened.json` implements H1–H7 and all required external-call error branches.
+- `workflows/hardened/t2-error-handler.json` records unhandled workflow errors in the local sink.
+- The intake guard checks PDF size, hashes the PDF, and checks committed content hashes before the model call.
+- The workflow caps text, per-run spend at $0.25, and model calls per minute before the DeepSeek request.
+- The invoice call is `deepseek-flash` from T9 on through credential `t2-deepseek`; the T8 baseline remains `gpt-4o-mini`.
+
+Files touched:
+- `workflows/hardened/t2-hardened.json` and `workflows/hardened/t2-error-handler.json`.
+- `specs/t2-rescue/tasks.md`, `.ai/STATUS.md`, `.ai/REVIEW.md`, and this file.
+
+Commands passed:
+- `python3 -m unittest discover -s tests -t . -v` — 29 tests OK.
+- `python3 -m compileall -q src tests` — OK.
+- Required secret grep — only scanner and test literals matched.
+- `python3 -m src.checks.static_checks --strict workflows/hardened/t2-hardened.json` — clean.
+- `python3 -m src.checks.static_checks --strict workflows/hardened/t2-error-handler.json` — clean.
+
+Decisions:
+- Q-6 remains local only; no public API or online target was used.
+- Q-7 keeps as-published execution evidence outside the scorecard.
+- The scorecard stays baseline-only until T11 adds the hardened phase.
+
+Next task: T10 — hardened validate through record, recipient allowlist, HTML escaping, normalizer check, and LLM error drill.
+Open risk: T9 has no live model call; T10 must run its invalid-key error-branch drill against the fake endpoint.
