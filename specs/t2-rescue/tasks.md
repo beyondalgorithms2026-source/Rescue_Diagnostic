@@ -19,6 +19,6 @@ Each task's acceptance is in `plan.md` under the same id. Do not start a task wh
 - [x] **T11a** Runner support for the hardened phase: error-handler import/publish, `T2_WEBHOOK_PATH_HARDENED`, credentials `t2-webhook-auth`/`t2-sink-auth`/`t2-deepseek` built in memory by `setup`, model and prices from `0. Config`, H-node stage map, `--replay-of` for I-8, `--env-file`. Fake-n8n tests. — deps: T10
 - [x] **T11** Hardened run on local (Q-6; same target as T8); re-score both phases into `evals/scorecard.csv`; then a third hardened pass-B-only replay against the same sink proves I-8 (0 new header rows) — record in summary.json. — deps: T10, T8a, Q-8
 - [x] **T12** Review (different family from the T9/T10 author): security review of hardened JSON + scorer; findings only, file:line, in the commit message of a docs-only commit or `.ai/HANDOFF.md`. — deps: T11
-- [ ] **T13** `evals/findings.md` one-pager: rollups, per-code table, OWASP mapping, residual risk (frontier). — deps: T12
+- [x] **T13** `evals/findings.md` one-pager: rollups, per-code table, OWASP mapping, residual risk (frontier). — deps: T12
 - [ ] **T14** README results table + `README.md` §Loom script (4 min) filled from findings (cheap prose). Public link is a human gate. — deps: T13
 - [ ] **T15** *(optional, not DoD)* Sheets adapter notes in README §7-equivalent. — deps: T13
