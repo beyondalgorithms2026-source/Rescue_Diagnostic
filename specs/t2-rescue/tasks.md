@@ -20,5 +20,5 @@ Each task's acceptance is in `plan.md` under the same id. Do not start a task wh
 - [x] **T11** Hardened run on local (Q-6; same target as T8); re-score both phases into `evals/scorecard.csv`; then a third hardened pass-B-only replay against the same sink proves I-8 (0 new header rows) — record in summary.json. — deps: T10, T8a, Q-8
 - [x] **T12** Review (different family from the T9/T10 author): security review of hardened JSON + scorer; findings only, file:line, in the commit message of a docs-only commit or `.ai/HANDOFF.md`. — deps: T11
 - [x] **T13** `evals/findings.md` one-pager: rollups, per-code table, OWASP mapping, residual risk (frontier). — deps: T12
-- [ ] **T14** README results table + `README.md` §Loom script (4 min) filled from findings (cheap prose). Public link is a human gate. — deps: T13
-- [ ] **T15** *(optional, not DoD)* Sheets adapter notes in README §7-equivalent. — deps: T13
+- [x] **T14** README results table + `README.md` §Loom script (4 min) filled from findings (cheap prose). Public link is a human gate. — deps: T13
+- [x] **T15** *(optional, not DoD)* Sheets adapter notes in README §7-equivalent. — deps: T13

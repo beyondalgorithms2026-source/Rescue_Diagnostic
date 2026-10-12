@@ -1,17 +1,17 @@
-Changed: `workflows/hardened/t2-hardened.json`, `workflows/hardened/t2-error-handler.json`, `tests/test_hardened.py`, `specs/t2-rescue/tasks.md`, `.ai/QUESTIONS.md`, `.ai/HANDOFF.md`, `.ai/STATUS.md`, `.ai/REVIEW.md`.
-Did: T10 adds H8–H16 and fixes the T9 defects. T10 is ticked.
-Did-not: T11, the runner, `docs/DECISIONS.md`, the baseline files, and the gold files.
-Check: 46 unit tests passed. Strict static checks passed on both files. The logic drill gave the expected route for 10 of 10 inputs.
-Check: the invalid-key drill gave DeepSeek 401, one errors row, and audit status error. No row went to the ledger or the invoices.
-Risk: the DeepSeek key in `.env` is a placeholder. T11 cannot call the model.
-Next: T11.
+Changed: `evals/findings.md`, `README.md`, `specs/t2-rescue/tasks.md`, `.ai/STATUS.md`, `.ai/HANDOFF.md`, `.ai/REVIEW.md` (T13–T15); earlier commits T11, T12.
+Did: T11 hardened run, T12 review, T13 findings, T14 README results and Loom script, T15 Sheets notes.
+Did-not: the push, the public link, the owner trace notes, and `docs/DECISIONS.md`.
+Check: 56 unit tests passed. Strict static checks passed. No secret value is in a committed file.
+Check: hardened clean 49/50, duplicate rows 0, replay new rows 0, model calls 58 vs 100.
+Risk: the T12 review is same-family. One PDF injection (t2-046) still changes an invoice number.
+Next: owner gates only — trace notes, push, public link.
 ```mermaid
 flowchart LR
-  H1[H1 intake + bytes] --> Hash[H1 SHA-256] --> H2{H2 seen?}
-  H2 --> H6[H6 DeepSeek] --> H8[H8 schema + foot] --> H10{H10 decide}
-  H10 --> H11{H11 dedupe} --> H12[H12 lines] --> H13[H13 header] --> H14[H14 report]
-  H10 --> H15[H15 review]
-  H14 --> H16[H16 audit]
-  H15 --> H16
-  H2 --> H16
+  B[Baseline run] --> S[Scorecard 100 rows]
+  H[Hardened run] --> S
+  H --> R[Replay pass B: 0 new rows]
+  S --> F[findings.md]
+  R --> F
+  F --> RM[README results + Loom]
+  RM --> G[Owner: push, public link]
 ```

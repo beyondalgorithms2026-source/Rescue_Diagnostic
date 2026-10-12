@@ -32,6 +32,7 @@ different family; the owner asked to finish all steps in Claude. Findings must d
 56 unit tests OK; compileall OK; strict static checks clean on both hardened files; the secret values (webhook token and
 path, sink token, OpenAI key) appear in no committed file.
 
-Next task: T13 — `evals/findings.md` one-pager (OWASP 2026: LLM01, LLM02, LLM03, LLM06; optional LLM10 one-liner).
-Still from the owner: trace notes (§ Trace notes in findings.md) and push approval.
+Update: T13 (`evals/findings.md`), T14 (README results + Loom script), T15 (Sheets notes) done. All task boxes ticked.
+Owner gates left: write § Trace notes in `evals/findings.md` (≥15 traces); approve the push; create the public link;
+optional cross-family review (Codex/GPT) before publishing.
 Local n8n: T2 workflows imported, none active.
