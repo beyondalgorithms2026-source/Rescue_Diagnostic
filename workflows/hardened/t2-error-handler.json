@@ -2,28 +2,121 @@
   "name": "T2 hardened — error handler",
   "nodes": [
     {
-      "parameters": {}, "id": "error-trigger", "name": "Error Trigger", "type": "n8n-nodes-base.errorTrigger", "typeVersion": 1, "position": [0, 300]
+      "parameters": {},
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
     },
     {
-      "parameters": {"jsCode": "const item = $input.first();\nconst execution = item.json.execution || {};\nconst workflow = item.json.workflow || {};\nreturn [{ json: { run_id: '', input_ref: '', stage: 'record', node: workflow.name || 'workflow', code: 'error:unhandled', message: execution.error?.message || item.json.error?.message || 'unhandled workflow error' } }];"},
-      "id": "error-shape", "name": "Shape Unhandled Error", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [220, 300]
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconst execution = item.json.execution || {};\nconst workflow = item.json.workflow || {};\nreturn [{ json: { run_id: '', input_ref: '', stage: 'record', node: workflow.name || 'workflow', code: 'error:unhandled', message: execution.error?.message || item.json.error?.message || 'unhandled workflow error' } }];"
+      },
+      "id": "error-shape",
+      "name": "Shape Unhandled Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ]
     },
     {
-      "parameters": {"method": "POST", "url": "__SINK_BASE_URL__/append/errors", "sendHeaders": true, "headerParameters": {"parameters": []}, "sendBody": true, "specifyBody": "json", "jsonBody": "={{$json}}", "options": {"timeout": 10000}},
-      "id": "error-sink", "name": "Append Unhandled Error", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [440, 300], "onError": "continueErrorOutput", "retryOnFail": true, "maxTries": 3, "waitBetweenTries": 1000,
-      "credentials": {"httpHeaderAuth": {"name": "t2-sink-auth"}}
+      "parameters": {
+        "method": "POST",
+        "url": "__SINK_BASE_URL__/append/errors",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {
+          "timeout": 10000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "id": "error-sink",
+      "name": "Append Unhandled Error",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        300
+      ],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "t2-sink-auth"
+        }
+      }
     },
     {
-      "parameters": {"jsCode": "return $input.all();"}, "id": "error-stop", "name": "Stop Error Handler", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [660, 360]
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "id": "error-stop",
+      "name": "Stop Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        360
+      ]
     }
   ],
   "connections": {
-    "Error Trigger": {"main": [[{"node": "Shape Unhandled Error", "type": "main", "index": 0}]]},
-    "Shape Unhandled Error": {"main": [[{"node": "Append Unhandled Error", "type": "main", "index": 0}]]},
-    "Append Unhandled Error": {"main": [[{"node": "Stop Error Handler", "type": "main", "index": 0}], [{"node": "Stop Error Handler", "type": "main", "index": 0}]]}
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Shape Unhandled Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape Unhandled Error": {
+      "main": [
+        [
+          {
+            "node": "Append Unhandled Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Unhandled Error": {
+      "main": [
+        [
+          {
+            "node": "Stop Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": {"executionOrder": "v1"},
+  "settings": {
+    "executionOrder": "v1"
+  },
   "active": false,
   "versionId": "t2-error-handler-1",
-  "tags": []
+  "tags": [],
+  "id": "t2ErrorHandler01"
 }

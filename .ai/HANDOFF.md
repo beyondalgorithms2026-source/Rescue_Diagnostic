@@ -1,29 +1,40 @@
 # Current handoff
-Task: T8a complete — scorer fix and baseline re-score.
-Commits: `4f0b22c` (ARCHITECTURE §6 amendment, Q-8) and the T8a commit after it.
+Task: T10 — IN PROGRESS (not ticked). Paused 2026-10-12 by the owner.
+Last commits: `95e2a43` T10a scorer (done), then the T10 WIP commit.
 
-Done:
-- `src/score/score.py`: pass comes from `replay_pass` (fallback `pass`, never a default "A"); `write_count` follows §4.3;
-  `retry_storm` counts failed attempts only; a workflow cap no longer fires `unbounded_spend`.
-- `tests/test_score.py`: 4 new tests with real sink stamps. Each one fails on the old scorer and passes on the new one.
-- `evals/scorecard.csv`: re-scored from `baseline-local-20261007T060333Z-nogit`. No n8n run, no model call. 50 rows, same header.
+Done in T10 so far (`workflows/hardened/*.json`, `tests/test_hardened.py`):
+- H8–H16 added: schema gate + foot check (H8), decide (H10), dedupe lookup (H11), line lookup/append with line_key (H12),
+  header last as commit (H13), escaped report + recipient allowlist (H14), review queue (H15), one audit row per input (H16).
+- JS normalizer in H8 passes the §3.5 vectors and matches Python (`tests/test_hardened.py`, run under node).
+- T9 defects fixed: Config `includeOtherFields: true` (Set 3.4 dropped body/binary); every HTTP node now has
+  `authentication: genericCredentialType` + `genericAuthType: httpHeaderAuth` (credentials were never sent);
+  webhook `webhookId` added (path was not registered); IF operators renamed to valid n8n names
+  (`isEmpty`→`empty`, `larger`→`gt`, `largerEqual`→`gte`) with `singleValue` and condition `version: 2`;
+  workflow ids `t2HardenedFlow01` / `t2ErrorHandler01`; error builder records the real code (`reject:capped` etc.).
+- H6 uses DeepSeek `json_object` (docs list no `json_schema`), `thinking: disabled`, word "json" in the prompt.
+- Config prices = DeepSeek `deepseek-flash` peak, cache miss: 0.30 in / 1.20 out per 1M tokens (pricing page, 2026-10-12).
+- Strict static checks clean on both files. 45 unit tests pass.
 
-Code counts, before → after (baseline, 50 inputs):
-- duplicate_write 3 → 48 (each invoice is written in pass A and again in pass B).
-- lineitem_mismatch 46 → 2; lineitem_ok 4 → 46 (pass B rows no longer leak into pass A).
-- retry_storm 31 → 0 (the baseline has no retries; line-item appends are writes).
-- silent_drop 1 → 3 (t2-003, t2-017: pass-A sink fault, no error row; t2-039).
-- validate_skip 0 → 2 (the two doc_foots=false invoices were written).
-- field_wrong 49 → 47, schema_miss 19 → 18; field counts drop by 1–2 because t2-003/t2-017 have no pass-A row.
-- Unchanged: audit_gap 50, tax_ok 0/50, clean documents 0/50.
+Where it stopped (live drill on local n8n 2.22.5, scratchpad script, fake DeepSeek on :8788):
+- Every input now passes H1, then fails at `H1 PDF SHA-256`: `$binary.Invoice_PDF.data` is undefined because n8n 2.x keeps
+  binary data on disk. The same fault makes the H1 byte-size check wrong (`pdf.data.length`).
+- That failure is unhandled (Crypto node has no error output) and the error workflow `t2ErrorHandler01` did not run
+  (no execution rows). Under investigation: `dist/execution-lifecycle/execute-error-workflow.js` line 50.
 
-Commands passed:
-- `python3 -m unittest discover -s tests -t .` — 33 tests OK.
-- `python3 -m compileall -q src tests` — OK.
-- Secret grep — only `src/checks/static_checks.py` and `tests/test_static_checks.py` (pattern literals).
+Next steps for T10:
+1. H1: get bytes with `await this.helpers.getBinaryDataBuffer(0, 'Invoice_PDF')` in the Code node; size = buffer length.
+2. Hash: Crypto node binary mode (check `nodes/Crypto/Crypto.node.js` params) or hash in H1 from the same buffer; give the hash step an error output.
+3. Find why the error workflow does not fire (published state? settings key?). Fix or record as residual risk.
+4. Re-run the logic drill. Expected routes: t2-001 A committed, t2-001 B duplicate_skip (content hash), t2-027 duplicate_skip (key),
+   t2-033 committed, t2-036 rejected, t2-037 review, t2-039 rejected, t2-047 rejected+capped, t2-003 committed after one 503 retry,
+   t2-044 committed with escaped HTML. Then the error drill: real api.deepseek.com with the placeholder key → errors row + audit `error`.
+5. Tick T10, update REVIEW/STATUS, commit.
 
-Next task: T10 — hardened validate through record (plan.md §T9/T10).
-Read first: AGENTS.md; ARCHITECTURE §3.1–3.5, §6; QUESTIONS Q-8; `workflows/hardened/t2-hardened.json`.
-Do not change: frozen contracts, `docs/DECISIONS.md`, baseline files, `evals/scorecard.csv` (T11 re-scores).
-Open questions: Q-8 — DeepSeek prices, exact model id, and whether the baseline is re-run on DeepSeek. Q-8 blocks T11, not T10.
-Open gaps: `evals/findings.md` § Trace notes does not exist (T8 human step). 6+ commits on `main` are not pushed.
+Blocked on the owner:
+- `DEEPSEEK_API_KEY` in `.env` is an 8-character placeholder (DeepSeek returns 401). T11 cannot run until a real key is set.
+- Q-8: confirm a DeepSeek re-run of the baseline (owner said "DeepSeek for all purpose").
+- `evals/findings.md` § Trace notes (human, ≥15 traces). Push approval: `main` is ahead of `origin` and tags `t8a-rescore` are local.
+
+Local state: n8n has `t2HardenedFlow01`, `t2ErrorHandler01`, `t2BaselineEquiv1` imported, none active. Credentials
+`t2-webhook-auth`, `t2-sink-auth` hold throwaway drill tokens; `t2-deepseek` holds the placeholder. Runner `setup` must overwrite them.
+Read first next time: AGENTS.md, this file, ARCHITECTURE §3, QUESTIONS Q-8.
