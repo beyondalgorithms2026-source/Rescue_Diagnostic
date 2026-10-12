@@ -25,10 +25,7 @@ Next task: T11 — the scored hardened run on local n8n:
   T2_WEBHOOK_TOKEN=<random> T2_WEBHOOK_PATH_HARDENED=<random> N8N_BASE_URL=http://localhost:5678 \
   python3 -m src.replay.run setup --phase hardened --sqlite unused   (creates credentials in memory)
   ... python3 -m src.replay.run run --phase hardened --sqlite unused   then  --replay-of <run_id>
-Runner changes needed (`src/replay/run.py`): `--phase hardened` uses `workflows/hardened/t2-hardened.json`, imports and
-publishes `t2-error-handler.json` too, webhook path `T2_WEBHOOK_PATH_HARDENED`, credentials `t2-webhook-auth`,
-`t2-sink-auth`, `t2-deepseek`; prices and model from the `0. Config` node; LLM node `H6 LLM Extract — DeepSeek`;
-stage map for H-nodes; `--replay-of RUN_ID` for the I-8 pass-B replay into an existing sink.
-Blocked on the owner: a real `DEEPSEEK_API_KEY` (current value is an 8-character placeholder), Q-8 baseline re-run confirmation,
-trace notes in `evals/findings.md`, push approval. T12 must be a non-Claude reviewer (ROUTING: T10 author is Claude).
+Still open: trace notes in `evals/findings.md` (owner), push approval (owner). T12 reviewer family: ROUTING asks for a
+non-Claude reviewer; the owner wants the remaining steps done in Claude, so disclose a same-family review if used.
+DeepSeek returns 401 with the current key; OpenAI fallback is approved (Q-8).
 Local n8n: T2 workflows imported, none active.
