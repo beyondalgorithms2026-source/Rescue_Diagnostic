@@ -1,11 +1,15 @@
-Changed: workflows/hardened/t2-hardened.json, workflows/hardened/t2-error-handler.json, specs/t2-rescue/tasks.md, .ai/HANDOFF.md, .ai/STATUS.md, and .ai/REVIEW.md changed.
-Did: T9 adds guarded intake, extraction caps, DeepSeek extraction, and ledger writes.
-Did-not: Baseline workflows, scorecard data, findings, and T10 nodes were left alone.
-Check: 29 tests, compile, and strict static checks passed; secret grep found only scanner and test literals.
-Risk: The fake-endpoint error drill is deferred to T10.
+Changed: `docs/ARCHITECTURE.md` (§1.1, §6), `.ai/QUESTIONS.md` (Q-8), `specs/t2-rescue/plan.md`, `specs/t2-rescue/tasks.md`, `src/score/score.py`, `tests/test_score.py`, `evals/scorecard.csv`, `.ai/HANDOFF.md`, `.ai/STATUS.md`, `.ai/REVIEW.md`.
+Did: T8a fixes four scorer rules and re-scores the T8 baseline run. The re-score uses no model call.
+Did-not: T10, workflows, `docs/DECISIONS.md`, the sink, the runner, and the gold files.
+Check: 33 unit tests passed. The 4 new tests fail on the old scorer. Compileall passed. The secret grep found only pattern literals.
+Check: baseline codes now: duplicate_write 48, lineitem_mismatch 2, retry_storm 0, silent_drop 3, validate_skip 2, audit_gap 50.
+Risk: Q-8 is open: DeepSeek prices, model id, and a baseline re-run on DeepSeek. Commits on `main` are not pushed.
 Next: T10.
 ```mermaid
 flowchart LR
-  Intake[H1 intake] --> Hash[H2 hash and duplicate lookup] --> Extract[H3-H4 extract and text cap] --> Gate[H5 spend and rate gate] --> LLM[H6 DeepSeek] --> Ledger[H7 ledger]
-  LLM --> Error[Error handler]
+  Arch[ARCHITECTURE §6 amended] --> Score[score.py fix]
+  Sink[sink stamps replay_input_id, replay_pass] --> Score
+  Score --> Tests[4 new tests]
+  Run[T8 run evidence] --> Score
+  Score --> Card[scorecard.csv 50 rows]
 ```

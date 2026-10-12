@@ -3,6 +3,8 @@ import json
 import os
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 
 from src.score.score import HEADER, score
 
@@ -62,6 +64,118 @@ class ScorerTests(unittest.TestCase):
                          manifest=manifest_path)
             self.assertEqual(rows[0]["invoice_no_hat"], "INV-1")
             self.assertNotIn("silent_drop", rows[0]["failure_codes"])
+
+
+BASELINE_INVOICE = ("Date", "Invoice No", "Vendor", "Invoice Date", "PO Number", "Total Amount", "Taxable Amount",
+                    "Total CGST", "Total SGST", "Line Items Count", "Currency", "Uploaded By")
+STAMPS = ("sink_seq", "sink_ts", "replay_input_id", "replay_pass")
+
+
+class AmendedRuleTests(unittest.TestCase):
+    """T8a: rows are stamped exactly as src/sink/server.py stamps them (ARCHITECTURE §6, amended 2026-10-12)."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = self.temp.name
+        self.run_id = "AMENDED"
+        self.sink = os.path.join(self.root, self.run_id, "sink")
+        os.makedirs(self.sink)
+        self.golds = {}
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def gold(self, input_id, invoice_no="INV-1", vendor="Acme", lines=(5, 6)):
+        self.golds[input_id] = {
+            "input_id": input_id, "label_bucket": "clean",
+            "dedupe_key": "{}|{}|USD".format(invoice_no, vendor.lower()),
+            "expected": {"invoice_no": invoice_no, "vendor": vendor, "invoice_date": "2026-01-01", "currency": "USD",
+                         "subtotal": 11, "tax": 0, "total": 11,
+                         "line_items": [{"description": "x", "line_total": v} for v in lines]}}
+
+    def table(self, name, fields, rows):
+        with open(os.path.join(self.sink, name + ".csv"), "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=STAMPS + tuple(fields))
+            writer.writeheader()
+            for seq, row in enumerate(rows, 1):
+                writer.writerow(dict({"sink_seq": seq, "sink_ts": "2026-01-01T00:00:00+00:00"}, **row))
+
+    def invoice(self, input_id, run_pass, invoice_no="INV-1"):
+        row = {k: "" for k in BASELINE_INVOICE}
+        row.update({"replay_input_id": input_id, "replay_pass": run_pass, "Invoice No": invoice_no,
+                    "Vendor": "Acme", "Invoice Date": "2026-01-01", "Currency": "USD",
+                    "Total Amount": "11", "Taxable Amount": "11"})
+        return row
+
+    def run_score(self, trace=(), requests=(), audit=None):
+        manifest = os.path.join(self.root, "manifest.csv")
+        with open(manifest, "w", encoding="utf-8") as f:
+            f.write("input_id,filename,label_bucket,gold_path\n")
+            for input_id, gold in self.golds.items():
+                path = os.path.join(self.root, input_id + ".json")
+                with open(path, "w", encoding="utf-8") as g:
+                    json.dump(gold, g)
+                f.write("{0},{0}.pdf,clean,{1}\n".format(input_id, path))
+        run_dir = os.path.join(self.root, self.run_id)
+        with open(os.path.join(run_dir, "trace.jsonl"), "w", encoding="utf-8") as f:
+            f.writelines(json.dumps(t) + "\n" for t in trace)
+        with open(os.path.join(self.sink, "requests.jsonl"), "w", encoding="utf-8") as f:
+            f.writelines(json.dumps(r) + "\n" for r in requests)
+        if audit is not None:
+            self.table("audit", ("run_id", "input_ref", "execution_id", "status", "code", "capped"), audit)
+        with open(os.path.join(run_dir, "summary.json"), "w", encoding="utf-8") as f:
+            json.dump({}, f)
+        with redirect_stdout(StringIO()):
+            rows = score(self.run_id, out=os.path.join(self.root, "out.csv"), runs_dir=self.root, manifest=manifest)
+        return {r["input_id"]: r for r in rows}
+
+    def test_line_items_and_hat_use_pass_a_only(self):
+        self.gold("t2-001")
+        self.table("invoices", BASELINE_INVOICE, [self.invoice("t2-001", "A"), self.invoice("t2-001", "B")])
+        lines = [{"replay_input_id": "t2-001", "replay_pass": p, "Line Total": v} for p in "AB" for v in ("5", "6")]
+        self.table("line_items", ("Line Total",), lines)
+        row = self.run_score()["t2-001"]
+        self.assertEqual(row["lineitem_count_hat"], 2)
+        self.assertEqual(row["lineitem_ok"], 1)
+        self.assertNotIn("lineitem_mismatch", row["failure_codes"])
+
+    def test_write_count_counts_attributed_rows_across_inputs_and_passes(self):
+        self.gold("t2-001")
+        self.gold("t2-002")
+        self.gold("t2-003", invoice_no="INV-9")
+        rows = [self.invoice("t2-001", "A"), self.invoice("t2-001", "B"), self.invoice("t2-002", "A"),
+                self.invoice("t2-003", "A", "INV-9")]
+        self.table("invoices", BASELINE_INVOICE, rows)
+        scored = self.run_score()
+        self.assertEqual(scored["t2-001"]["write_count"], 3)
+        self.assertEqual(scored["t2-002"]["write_count"], 3)
+        self.assertIn("duplicate_write", scored["t2-001"]["failure_codes"])
+        self.assertEqual(scored["t2-003"]["write_count"], 1)
+        self.assertEqual(scored["t2-003"]["duplicate"], 0)
+
+    def test_retry_storm_counts_failed_attempts_not_writes(self):
+        self.gold("t2-001")
+        self.gold("t2-002", invoice_no="INV-2")
+        self.table("invoices", BASELINE_INVOICE, [self.invoice("t2-001", "A"), self.invoice("t2-002", "A", "INV-2")])
+        writes = [{"path": "/append/line_items", "status": 200, "active_input": "t2-001", "pass": "A"}] * 6
+        storm = [{"path": "/append/invoices", "status": 503, "active_input": "t2-002", "pass": "A"}] * 4
+        scored = self.run_score(requests=writes + storm)
+        self.assertNotIn("retry_storm", scored["t2-001"]["failure_codes"])
+        self.assertIn("retry_storm", scored["t2-002"]["failure_codes"])
+
+    def test_workflow_cap_is_not_unbounded_spend_but_runner_cap_is(self):
+        self.gold("t2-001")
+        self.gold("t2-002", invoice_no="INV-2")
+        self.table("invoices", BASELINE_INVOICE, [])
+        audit = [{"replay_input_id": "t2-001", "replay_pass": "A", "run_id": self.run_id, "input_ref": "t2-001",
+                  "execution_id": "1", "status": "rejected", "code": "capped", "capped": "1"}]
+        trace = [{"node": "record", "ok": True, "pass": "A", "input_id": "t2-002", "capped": True,
+                  "error": "runner_cap", "tokens_in": 0}]
+        scored = self.run_score(trace=trace, audit=audit)
+        self.assertEqual(scored["t2-001"]["capped"], 1)
+        self.assertNotIn("unbounded_spend", scored["t2-001"]["failure_codes"])
+        self.assertEqual(scored["t2-002"]["capped"], 1)
+        self.assertIn("unbounded_spend", scored["t2-002"]["failure_codes"])
 
 
 if __name__ == "__main__":

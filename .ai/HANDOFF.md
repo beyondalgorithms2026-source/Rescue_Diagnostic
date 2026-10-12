@@ -1,29 +1,29 @@
 # Current handoff
-Task: T9 complete — hardened intake through ledger workflow files.
-Commit: `d56a569 Complete T8 repaired baseline replay`.
+Task: T8a complete — scorer fix and baseline re-score.
+Commits: `4f0b22c` (ARCHITECTURE §6 amendment, Q-8) and the T8a commit after it.
 
 Done:
-- `workflows/hardened/t2-hardened.json` implements H1–H7 and all required external-call error branches.
-- `workflows/hardened/t2-error-handler.json` records unhandled workflow errors in the local sink.
-- The intake guard checks PDF size, hashes the PDF, and checks committed content hashes before the model call.
-- The workflow caps text, per-run spend at $0.25, and model calls per minute before the DeepSeek request.
-- The invoice call is `deepseek-flash` from T9 on through credential `t2-deepseek`; the T8 baseline remains `gpt-4o-mini`.
+- `src/score/score.py`: pass comes from `replay_pass` (fallback `pass`, never a default "A"); `write_count` follows §4.3;
+  `retry_storm` counts failed attempts only; a workflow cap no longer fires `unbounded_spend`.
+- `tests/test_score.py`: 4 new tests with real sink stamps. Each one fails on the old scorer and passes on the new one.
+- `evals/scorecard.csv`: re-scored from `baseline-local-20261007T060333Z-nogit`. No n8n run, no model call. 50 rows, same header.
 
-Files touched:
-- `workflows/hardened/t2-hardened.json` and `workflows/hardened/t2-error-handler.json`.
-- `specs/t2-rescue/tasks.md`, `.ai/STATUS.md`, `.ai/REVIEW.md`, and this file.
+Code counts, before → after (baseline, 50 inputs):
+- duplicate_write 3 → 48 (each invoice is written in pass A and again in pass B).
+- lineitem_mismatch 46 → 2; lineitem_ok 4 → 46 (pass B rows no longer leak into pass A).
+- retry_storm 31 → 0 (the baseline has no retries; line-item appends are writes).
+- silent_drop 1 → 3 (t2-003, t2-017: pass-A sink fault, no error row; t2-039).
+- validate_skip 0 → 2 (the two doc_foots=false invoices were written).
+- field_wrong 49 → 47, schema_miss 19 → 18; field counts drop by 1–2 because t2-003/t2-017 have no pass-A row.
+- Unchanged: audit_gap 50, tax_ok 0/50, clean documents 0/50.
 
 Commands passed:
-- `python3 -m unittest discover -s tests -t . -v` — 29 tests OK.
+- `python3 -m unittest discover -s tests -t .` — 33 tests OK.
 - `python3 -m compileall -q src tests` — OK.
-- Required secret grep — only scanner and test literals matched.
-- `python3 -m src.checks.static_checks --strict workflows/hardened/t2-hardened.json` — clean.
-- `python3 -m src.checks.static_checks --strict workflows/hardened/t2-error-handler.json` — clean.
+- Secret grep — only `src/checks/static_checks.py` and `tests/test_static_checks.py` (pattern literals).
 
-Decisions:
-- Q-6 remains local only; no public API or online target was used.
-- Q-7 keeps as-published execution evidence outside the scorecard.
-- The scorecard stays baseline-only until T11 adds the hardened phase.
-
-Next task: T10 — hardened validate through record, recipient allowlist, HTML escaping, normalizer check, and LLM error drill.
-Open risk: T9 has no live model call; T10 must run its invalid-key error-branch drill against the fake endpoint.
+Next task: T10 — hardened validate through record (plan.md §T9/T10).
+Read first: AGENTS.md; ARCHITECTURE §3.1–3.5, §6; QUESTIONS Q-8; `workflows/hardened/t2-hardened.json`.
+Do not change: frozen contracts, `docs/DECISIONS.md`, baseline files, `evals/scorecard.csv` (T11 re-scores).
+Open questions: Q-8 — DeepSeek prices, exact model id, and whether the baseline is re-run on DeepSeek. Q-8 blocks T11, not T10.
+Open gaps: `evals/findings.md` § Trace notes does not exist (T8 human step). 6+ commits on `main` are not pushed.

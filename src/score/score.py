@@ -104,12 +104,21 @@ def _attr(row, input_id):
             row.get("active_input") == input_id or row.get("replay_input_id") == input_id)
 
 
+def _pass(row):
+    """Sink rows carry the stamp replay_pass; request-log, trace, and stub rows carry pass (§6)."""
+    return row.get("replay_pass") or row.get("pass") or ""
+
+
+def _own(rows, input_id, run_pass=None):
+    return [r for r in rows if _attr(r, input_id) and (run_pass is None or _pass(r) == run_pass)]
+
+
 def _hat_row(tables, input_id, phase):
-    invoices = [r for r in tables["invoices"] if _attr(r, input_id) and r.get("pass", "A") == "A"]
+    invoices = _own(tables["invoices"], input_id, "A")
     if invoices:
         return _canonicalize(invoices[0])
     if phase == "hardened":
-        review = [r for r in tables["review_queue"] if _attr(r, input_id) and r.get("pass", "A") == "A"]
+        review = _own(tables["review_queue"], input_id, "A")
         if review:
             raw = review[0].get("extracted_json", "")
             try:
@@ -134,7 +143,7 @@ def _canonicalize(row):
     return result
 
 
-def _score_input(run_id, phase, inp, gold, evidence, phase_runs):
+def _score_input(run_id, phase, inp, gold, evidence, phase_runs, inputs_by_key):
     tables, trace, requests, summary = evidence
     input_id, expected = inp["input_id"], gold.get("expected", {})
     hat = _hat_row(tables, input_id, phase)
@@ -144,7 +153,7 @@ def _score_input(run_id, phase, inp, gold, evidence, phase_runs):
         if mapped is not None:
             hat["tax"] = str(mapped)
     has_hat = _hat_row(tables, input_id, phase) is not None
-    lines = [_canonicalize(r) for r in tables["line_items"] if _attr(r, input_id) and r.get("pass", "A") == "A"]
+    lines = [_canonicalize(r) for r in _own(tables["line_items"], input_id, "A")]
     expected_lines = expected.get("line_items") or []
     line_ok = int(len(lines) == len(expected_lines) and _multiset_equal(_line_values(lines), [parse_amount(x.get("line_total")) for x in expected_lines if parse_amount(x.get("line_total")) is not None]))
     missing_bucket = gold.get("label_bucket") == "missing_field"
@@ -164,37 +173,35 @@ def _score_input(run_id, phase, inp, gold, evidence, phase_runs):
             codes.add("field_wrong")
         if line_ok == 0:
             codes.add("lineitem_mismatch")
-    phase_writes = tables["invoices"]
-    gold_key = gold.get("dedupe_key") or dedupe_key(expected.get("invoice_no"), expected.get("vendor"), expected.get("currency"))
-    if gold_key:
-        write_count = sum(1 for r in phase_writes if r.get("dedupe_key") == gold_key)
-    else:
-        write_count = sum(1 for r in phase_writes if _attr(r, input_id))
+    # §4.3: header rows from both passes, attributed to any input that shares this input's gold key.
+    gold_key = _gold_key(gold)
+    same_key = inputs_by_key.get(gold_key, {input_id}) if gold_key else {input_id}
+    write_count = sum(1 for r in tables["invoices"] if any(_attr(r, other) for other in same_key))
     if write_count > 1:
         codes.add("duplicate_write")
-    own_rows = lambda name: [r for r in tables[name] if _attr(r, input_id) and r.get("pass", "A") == "A"]
-    errors, audits = own_rows("errors"), own_rows("audit")
+    errors, audits = _own(tables["errors"], input_id, "A"), _own(tables["audit"], input_id, "A")
     terminal = [r for r in audits if r.get("status")]
     if not has_hat and not errors and not terminal:
         codes.add("silent_drop")
-    # Count calls by provider/table and pass using both execution trace and sink request log.
-    call_counts = defaultdict(int)
-    for row in trace:
-        if row.get("input_id") != input_id:
-            continue
+    # Amended §6: count FAILED attempts per target, input, and pass. One append per line item is a write.
+    failed = defaultdict(int)
+    for row in _own(trace, input_id):
         name = str(row.get("node", "")).lower()
-        if "openai" in name or "llm" in name:
-            call_counts[("openai", row.get("pass", "A"))] += 1
-    for row in requests:
-        if row.get("input_id") != input_id and row.get("active_input") != input_id:
-            continue
-        target = str(row.get("target") or row.get("table") or row.get("path", "")).split("/")[-1]
-        if target in ("invoices", "line_items", "outbox"):
-            call_counts[("sink:" + target, row.get("pass", "A"))] += 1
-    if any(n > 3 for n in call_counts.values()):
+        if ("openai" in name or "llm" in name) and not _truth(row.get("ok", True)):
+            failed[("openai", _pass(row))] += 1
+    for row in _own(requests, input_id):
+        path = str(row.get("path", ""))
+        if path.startswith("/append/") and int(row.get("status") or 0) >= 500:
+            failed[("sink:" + path.split("/")[-1], _pass(row))] += 1
+    if any(n > 3 for n in failed.values()):
         codes.add("retry_storm")
-    capped = int(any(_truth(r.get("capped")) or (r.get("status") == "rejected" and r.get("code") == "capped") for r in audits) or any(_truth(r.get("capped")) for r in trace if r.get("input_id") == input_id))
-    if capped or any(int(r.get("tokens_in", 0) or 0) > 40000 / 3 for r in trace if r.get("input_id") == input_id):
+    own_trace_rows = _own(trace, input_id)
+    workflow_capped = any(_truth(r.get("capped")) or (r.get("status") == "rejected" and r.get("code") == "capped")
+                          for r in audits)
+    runner_capped = any(r.get("error") == "runner_cap" for r in own_trace_rows)
+    capped = int(workflow_capped or runner_capped)
+    oversized_call = any(int(r.get("tokens_in", 0) or 0) > 40000 / 3 for r in own_trace_rows)
+    if runner_capped or (oversized_call and not workflow_capped):
         codes.add("unbounded_spend")
     if gold.get("doc_foots") is False and write_count:
         codes.add("validate_skip")
@@ -231,16 +238,26 @@ def _score_input(run_id, phase, inp, gold, evidence, phase_runs):
     return row
 
 
+def _gold_key(gold):
+    expected = gold.get("expected", {})
+    return gold.get("dedupe_key") or dedupe_key(expected.get("invoice_no"), expected.get("vendor"), expected.get("currency"))
+
+
 def score(baseline, hardened=None, out="evals/scorecard.csv", runs_dir="evals/runs", manifest="evals/inputs/manifest.csv"):
     inputs = _read_csv(manifest)
+    golds = {inp["input_id"]: _read_json(inp["gold_path"]) for inp in inputs}
+    inputs_by_key = defaultdict(set)
+    for input_id, gold in golds.items():
+        key = _gold_key(gold)
+        if key:
+            inputs_by_key[key].add(input_id)
     rows = []
     for run_id, phase in [(baseline, "baseline")] + ([(hardened, "hardened")] if hardened else []):
         run_dir = os.path.join(runs_dir, run_id)
         evidence = _load_run(run_dir)
         phase_runs = [(run_id, evidence)]
         for inp in inputs:
-            gold = _read_json(inp["gold_path"])
-            rows.append(_score_input(run_id, phase, inp, gold, evidence, phase_runs))
+            rows.append(_score_input(run_id, phase, inp, golds[inp["input_id"]], evidence, phase_runs, inputs_by_key))
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     with open(out, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=HEADER)
