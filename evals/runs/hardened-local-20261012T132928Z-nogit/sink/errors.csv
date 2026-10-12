@@ -1,0 +1,19 @@
+sink_seq,sink_ts,replay_input_id,replay_pass,run_id,input_ref,stage,node,code,message
+241,2026-10-12T13:32:05.204211+00:00,t2-035,A,hardened-local-20261012T132928Z-nogit,t2-035,validate,H8 Schema Gate,reject:schema,invoice_no missing
+244,2026-10-12T13:32:07.525075+00:00,t2-036,A,hardened-local-20261012T132928Z-nogit,t2-036,validate,H8 Schema Gate,reject:schema,invoice_no missing
+253,2026-10-12T13:32:17.505391+00:00,t2-039,A,hardened-local-20261012T132928Z-nogit,t2-039,validate,H8 Schema Gate,reject:schema,line_items empty
+255,2026-10-12T13:32:17.910586+00:00,t2-040,A,hardened-local-20261012T132928Z-nogit,t2-040,intake,H1 Intake Guard,reject:intake,"missing required form data or PDF, or PDF exceeds size cap"
+307,2026-10-12T13:32:38.761470+00:00,t2-047,A,hardened-local-20261012T132928Z-nogit,t2-047,extract,external call,reject:capped,PDF text exceeds input cap
+309,2026-10-12T13:32:39.169064+00:00,t2-048,A,hardened-local-20261012T132928Z-nogit,t2-048,extract,external call,reject:capped,PDF text exceeds input cap
+374,2026-10-12T13:33:23.496601+00:00,t2-035,B,hardened-local-20261012T132928Z-nogit,t2-035,validate,H8 Schema Gate,reject:schema,invoice_no missing
+377,2026-10-12T13:33:25.575866+00:00,t2-036,B,hardened-local-20261012T132928Z-nogit,t2-036,validate,H8 Schema Gate,reject:schema,invoice_no missing
+386,2026-10-12T13:33:34.014561+00:00,t2-039,B,hardened-local-20261012T132928Z-nogit,t2-039,validate,H8 Schema Gate,reject:schema,line_items empty
+388,2026-10-12T13:33:34.374169+00:00,t2-040,B,hardened-local-20261012T132928Z-nogit,t2-040,intake,H1 Intake Guard,reject:intake,"missing required form data or PDF, or PDF exceeds size cap"
+396,2026-10-12T13:33:36.755871+00:00,t2-047,B,hardened-local-20261012T132928Z-nogit,t2-047,extract,external call,reject:capped,PDF text exceeds input cap
+398,2026-10-12T13:33:37.152401+00:00,t2-048,B,hardened-local-20261012T132928Z-nogit,t2-048,extract,external call,reject:capped,PDF text exceeds input cap
+449,2026-10-12T13:34:53.639746+00:00,t2-035,B,hardened-local-20261012T132928Z-nogit,t2-035,validate,H8 Schema Gate,reject:schema,invoice_no missing
+452,2026-10-12T13:34:56.059099+00:00,t2-036,B,hardened-local-20261012T132928Z-nogit,t2-036,validate,H8 Schema Gate,reject:schema,invoice_no missing
+461,2026-10-12T13:35:04.151583+00:00,t2-039,B,hardened-local-20261012T132928Z-nogit,t2-039,validate,H8 Schema Gate,reject:schema,line_items empty
+463,2026-10-12T13:35:04.557078+00:00,t2-040,B,hardened-local-20261012T132928Z-nogit,t2-040,intake,H1 Intake Guard,reject:intake,"missing required form data or PDF, or PDF exceeds size cap"
+471,2026-10-12T13:35:07.006182+00:00,t2-047,B,hardened-local-20261012T132928Z-nogit,t2-047,extract,external call,reject:capped,PDF text exceeds input cap
+473,2026-10-12T13:35:07.369218+00:00,t2-048,B,hardened-local-20261012T132928Z-nogit,t2-048,extract,external call,reject:capped,PDF text exceeds input cap

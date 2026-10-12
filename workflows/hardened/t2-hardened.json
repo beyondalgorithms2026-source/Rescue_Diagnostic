@@ -788,7 +788,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const lines = $('H12 Line Items').all();\nreturn $input.all().map((found, index) => ({ json: { ...lines[index].json, exists: Number(found.json.count || 0) > 0 } }));\n"
+        "jsCode": "const line = $('H12 Loop Lines').first().json;\nreturn [{ json: { ...line, exists: Number($json.count || 0) > 0 } }];\n"
       },
       "id": "t10-h12-5740",
       "name": "H12 Line Plan",
@@ -1026,6 +1026,20 @@
           "name": "t2-sink-auth"
         }
       }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "t11-h12-loop",
+      "name": "H12 Loop Lines",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        5410,
+        760
+      ]
     }
   ],
   "connections": {
@@ -1485,7 +1499,7 @@
       "main": [
         [
           {
-            "node": "H12 Line Lookup",
+            "node": "H12 Loop Lines",
             "type": "main",
             "index": 0
           }
@@ -1525,7 +1539,7 @@
       "main": [
         [
           {
-            "node": "H13 Header Build",
+            "node": "H12 Loop Lines",
             "type": "main",
             "index": 0
           }
@@ -1632,6 +1646,24 @@
         [
           {
             "node": "E Stop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "H12 Loop Lines": {
+      "main": [
+        [
+          {
+            "node": "H13 Header Build",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "H12 Line Lookup",
             "type": "main",
             "index": 0
           }

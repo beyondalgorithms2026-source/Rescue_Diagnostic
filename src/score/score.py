@@ -174,6 +174,9 @@ def _score_input(run_id, phase, inp, gold, evidence, phase_runs, inputs_by_key):
             hat["tax"] = str(mapped)
     has_hat = _hat_row(tables, input_id, phase) is not None
     lines = [_canonicalize(r) for r in _own(tables["line_items"], input_id, "A")]
+    if not lines and isinstance(hat.get("line_items"), list):
+        # §6 hat source: a review outcome writes no line rows; its lines are in review_queue.extracted_json.
+        lines = [_canonicalize(line) for line in hat["line_items"] if isinstance(line, dict)]
     expected_lines = expected.get("line_items") or []
     line_ok = int(len(lines) == len(expected_lines) and _multiset_equal(_line_values(lines), [parse_amount(x.get("line_total")) for x in expected_lines if parse_amount(x.get("line_total")) is not None]))
     missing_bucket = gold.get("label_bucket") == "missing_field"

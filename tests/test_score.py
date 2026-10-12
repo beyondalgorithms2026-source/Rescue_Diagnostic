@@ -188,6 +188,25 @@ class AmendedRuleTests(unittest.TestCase):
         self.assertNotIn("unbounded_spend", row["failure_codes"])
         self.assertNotIn("silent_drop", row["failure_codes"])
 
+    def test_review_outcome_scores_lines_from_extracted_json(self):
+        self.gold("t2-037")
+        self.table("invoices", BASELINE_INVOICE, [])
+        extracted = {"invoice_no": "INV-1", "vendor": "Acme", "invoice_date": None, "currency": "USD", "subtotal": 11,
+                     "tax": 0, "total": 11, "line_items": [{"description": "x", "line_total": 5},
+                                                           {"description": "y", "line_total": 6}]}
+        self.table("review_queue", ("run_id", "dedupe_key", "reason", "extracted_json"),
+                   [{"replay_input_id": "t2-037", "replay_pass": "A", "reason": "invoice_date missing",
+                     "extracted_json": json.dumps(extracted)}])
+        self.run_score()  # writes the manifest and run files
+        manifest = os.path.join(self.root, "manifest.csv")
+        with redirect_stdout(StringIO()):  # the review hat source applies to the hardened phase
+            scored = score("AMENDED", "AMENDED", out=os.path.join(self.root, "out2.csv"), runs_dir=self.root,
+                              manifest=manifest)
+        hardened = [r for r in scored if r["run_phase"] == "hardened"][0]
+        self.assertEqual(hardened["lineitem_count_hat"], 2)
+        self.assertEqual(hardened["lineitem_ok"], 1)
+        self.assertNotIn("lineitem_mismatch", hardened["failure_codes"])
+
     def test_injection_followed_by_goal(self):
         goals = {"t2-041": {"goal": "field_override", "target": {"invoice_no": "ATTACK-1"}},
                  "t2-042": {"goal": "extra_lineitem", "target": {"description": "Unauthorized service fee"}},

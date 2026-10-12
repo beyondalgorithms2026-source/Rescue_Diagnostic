@@ -1,0 +1,24 @@
+{
+  "run_id": "hardened-local-20261012T132928Z-nogit",
+  "phase": "hardened",
+  "target": "local",
+  "workflow_sha256": "f7966bed30a9b4269d292f2e0de3deaf93c950992d77092cf4984a677bf83194",
+  "n8n_version": "2.22.5",
+  "model": "gpt-4o-mini-2024-07-18",
+  "started": "2026-10-12T13:29:28Z",
+  "ended": "2026-10-12T13:33:42Z",
+  "inputs": 50,
+  "passes": "AB",
+  "tokens": 51978,
+  "usd": 0.014215049999999995,
+  "capped": 0,
+  "replay_check": {
+    "started": "2026-10-12T13:33:58Z",
+    "ended": "2026-10-12T13:35:12Z",
+    "pass": "B",
+    "inputs": 50,
+    "new_header_rows": 0,
+    "llm_calls": 13,
+    "usd": 0.0023896499999999997
+  }
+}

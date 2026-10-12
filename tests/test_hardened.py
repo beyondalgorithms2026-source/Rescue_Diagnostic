@@ -54,7 +54,11 @@ class HardenedWorkflowTests(unittest.TestCase):
 
     def test_header_is_written_after_line_items(self):
         conn = self.workflow["connections"]
-        self.assertEqual(conn["H12 Line Append"]["main"][0][0]["node"], "H13 Header Build")
+        loop = self.nodes["H12 Loop Lines"]
+        self.assertEqual(loop["parameters"]["batchSize"], 1, "a retry must re-send only the failed line")
+        self.assertEqual(conn["H12 Line Append"]["main"][0][0]["node"], "H12 Loop Lines")
+        self.assertEqual(conn["H12 Loop Lines"]["main"][0][0]["node"], "H13 Header Build")  # done
+        self.assertEqual(conn["H12 Loop Lines"]["main"][1][0]["node"], "H12 Line Lookup")   # loop
         self.assertEqual(conn["H13 Header Build"]["main"][0][0]["node"], "H13 Header Append")
 
     def test_config_keeps_input_and_notes_never_reach_the_model(self):
