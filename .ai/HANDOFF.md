@@ -19,7 +19,12 @@ Evidence (local n8n 2.22.5, scratchpad drill, fake DeepSeek for logic, real Deep
 
 Commands passed: 46 unit tests; compileall; strict static checks on both hardened files; secret grep (pattern files only).
 
-Next task: T11 — runner support for the hardened phase, then the hardened run.
+Update 2026-10-12: T11a runner support done (`8208775`). H6 is provider-neutral (`H6 LLM Extract`, credential `t2-llm`,
+Config `llm_base_url`); OpenAI `gpt-4o-mini-2024-07-18` is the owner-approved fallback (Q-8).
+Next task: T11 — the scored hardened run on local n8n:
+  T2_WEBHOOK_TOKEN=<random> T2_WEBHOOK_PATH_HARDENED=<random> N8N_BASE_URL=http://localhost:5678 \
+  python3 -m src.replay.run setup --phase hardened --sqlite unused   (creates credentials in memory)
+  ... python3 -m src.replay.run run --phase hardened --sqlite unused   then  --replay-of <run_id>
 Runner changes needed (`src/replay/run.py`): `--phase hardened` uses `workflows/hardened/t2-hardened.json`, imports and
 publishes `t2-error-handler.json` too, webhook path `T2_WEBHOOK_PATH_HARDENED`, credentials `t2-webhook-auth`,
 `t2-sink-auth`, `t2-deepseek`; prices and model from the `0. Config` node; LLM node `H6 LLM Extract — DeepSeek`;

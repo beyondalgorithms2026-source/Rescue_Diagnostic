@@ -59,7 +59,7 @@ class HardenedWorkflowTests(unittest.TestCase):
 
     def test_config_keeps_input_and_notes_never_reach_the_model(self):
         self.assertTrue(self.nodes["0. Config"]["parameters"]["includeOtherFields"])
-        body = self.nodes["H6 LLM Extract — DeepSeek"]["parameters"]["jsonBody"]
+        body = self.nodes["H6 LLM Extract"]["parameters"]["jsonBody"]
         self.assertNotIn("notes", body.lower())
         self.assertIn("json_object", body)
         self.assertIn("json", body.split("system", 1)[1].lower())

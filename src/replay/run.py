@@ -47,10 +47,10 @@ REPAIRED_BASELINE = Path("workflows/baseline/upstream/16643-repaired-to-run.json
 EQUIVALENT_BASELINE = "workflows/baseline/upstream/16643-equivalent.json"
 HARDENED = Path("workflows/hardened/t2-hardened.json")
 HANDLER = Path("workflows/hardened/t2-error-handler.json")
-HARDENED_LLM = "H6 LLM Extract — DeepSeek"
+HARDENED_LLM = "H6 LLM Extract"
 BASELINE_MODEL = "gpt-4o-mini-2024-07-18"
 CREDENTIAL_IDS = {"t2-openai": "t2OpenAiSmoke001", "t2-webhook-auth": "t2WebhookAuth001",
-                  "t2-sink-auth": "t2SinkAuth000001", "t2-deepseek": "t2DeepSeekKey001"}
+                  "t2-sink-auth": "t2SinkAuth000001", "t2-llm": "t2LlmBearerKey01"}
 HARDENED_STAGES = (("H1 ", "intake"), ("H2 ", "intake"), ("H3 ", "extract"), ("H4 ", "extract"), ("H5 ", "extract"),
                    ("H6 ", "extract"), ("H7 ", "extract"), ("H8 ", "validate"), ("H10 ", "decide"),
                    ("H11 ", "act"), ("H12 ", "act"), ("H13 ", "act"), ("H14 ", "act"), ("H15 ", "approve"),
@@ -93,7 +93,7 @@ def phase_settings(phase, workflow):
         if float(cfg["run_usd_cap"]) != RUN_CAP:
             raise ValueError("0. Config run_usd_cap must be 0.25")
         return {"path_var": "T2_WEBHOOK_PATH_HARDENED", "model": cfg["llm_model"], "llm_node": HARDENED_LLM,
-                "credentials": ("t2-webhook-auth", "t2-sink-auth", "t2-deepseek"),
+                "credentials": ("t2-webhook-auth", "t2-sink-auth", "t2-llm"),
                 "price_in": float(cfg["llm_price_in_per_mtok"]), "price_out": float(cfg["llm_price_out_per_mtok"])}
     return {"path_var": "T2_WEBHOOK_PATH_BASELINE", "model": BASELINE_MODEL, "llm_node": equivalent.LLM,
             "credentials": tuple(name for _, name in equivalent.CREDENTIALS.values()),
@@ -107,8 +107,10 @@ def credential_payload(env):
         return {"id": cid, "name": name, "type": "httpHeaderAuth", "data": {"name": header_name, "value": value}}
     return [header(CREDENTIAL_IDS["t2-webhook-auth"], "t2-webhook-auth", "X-T2-Token", env["T2_WEBHOOK_TOKEN"]),
             header(CREDENTIAL_IDS["t2-sink-auth"], "t2-sink-auth", "X-Sink-Token", env["SINK_TOKEN"]),
-            header(CREDENTIAL_IDS["t2-deepseek"], "t2-deepseek", "Authorization",
-                   "Bearer " + env.get("DEEPSEEK_API_KEY", "")),
+            # Q-8: DeepSeek is primary; OpenAI is the owner-approved fallback (T2_LLM_PROVIDER).
+            header(CREDENTIAL_IDS["t2-llm"], "t2-llm", "Authorization", "Bearer " + (
+                env.get("DEEPSEEK_API_KEY", "") if env.get("T2_LLM_PROVIDER") == "deepseek"
+                else env.get("OPENAI_API_KEY", ""))),
             {"id": CREDENTIAL_IDS["t2-openai"], "name": "t2-openai", "type": "openAiApi",
              "data": {"apiKey": env.get("OPENAI_API_KEY", "")}}]
 

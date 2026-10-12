@@ -114,6 +114,11 @@ node uses the peak prices so the cap never under-counts. DeepSeek documents `res
 Still needed from the owner: a real DEEPSEEK_API_KEY in `.env` (the current value is an 8-character placeholder;
 DeepSeek answers 401), and confirmation of the DeepSeek baseline re-run.
 
+Owner answer (2026-10-12, in chat): "In case deepseek does not work as a back up use OpenAI as of now."
+Recorded as: DeepSeek is primary; OpenAI is the fallback. The DeepSeek key is invalid, so the hardened phase uses
+`gpt-4o-mini-2024-07-18` via api.openai.com (Config `llm_base_url`, `llm_model`; credential `t2-llm`; runner
+`T2_LLM_PROVIDER=deepseek` switches back). Both scored phases now use the same model, so no baseline re-run is needed.
+
 ## Q-5 Git — blocks the first commit
 This folder is not a git repository. Thin Ledger Session A says the human runs `git init`. Public remote name/visibility is a later human gate.
 Answer (2026-10-05): git init done by hand. No public remote yet.

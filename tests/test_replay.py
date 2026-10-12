@@ -179,11 +179,11 @@ class HardenedReplayTests(ReplayTests):
                                       ("unpublish", "t2HardenedFlow01"), ("unpublish", "t2ErrorHandler01")])
         self.assertTrue(all(url.endswith("/webhook/hpath") for url in hooks))
         summary = json.loads((run_dir / "summary.json").read_text())
-        self.assertEqual(summary["model"], "deepseek-flash")
+        self.assertEqual(summary["model"], "gpt-4o-mini-2024-07-18")
         events = [json.loads(line) for line in (run_dir / "trace.jsonl").read_text().splitlines()]
         llm = [e for e in events if e["node"] == run.HARDENED_LLM]
         self.assertEqual(len(llm), 4)
-        self.assertAlmostEqual(llm[0]["usd"], (1000 * 0.30 + 100 * 1.20) / 1e6)
+        self.assertAlmostEqual(llm[0]["usd"], (1000 * 0.15 + 100 * 0.60) / 1e6)
         self.assertEqual({e["stage"] for e in events}, {"extract", "act"})
         with (self.root / "cost_ledger.csv").open(newline="", encoding="utf-8") as f:
             self.assertEqual(list(csv.DictReader(f))[0]["llm_calls"], "4")
@@ -207,9 +207,11 @@ class HardenedReplayTests(ReplayTests):
         self.assertEqual(run.stage_for(run.equivalent.LLM), "extract")
 
     def test_credentials_are_built_in_memory_from_env(self):
-        payload = run.credential_payload({"T2_WEBHOOK_TOKEN": "w", "SINK_TOKEN": "s", "DEEPSEEK_API_KEY": "k"})
-        by_name = {c["name"]: c for c in payload}
-        self.assertEqual(by_name["t2-deepseek"]["data"], {"name": "Authorization", "value": "Bearer k"})
+        env = {"T2_WEBHOOK_TOKEN": "w", "SINK_TOKEN": "s", "DEEPSEEK_API_KEY": "d", "OPENAI_API_KEY": "o"}
+        by_name = {c["name"]: c for c in run.credential_payload(env)}
+        self.assertEqual(by_name["t2-llm"]["data"], {"name": "Authorization", "value": "Bearer o"})
+        by_name = {c["name"]: c for c in run.credential_payload(dict(env, T2_LLM_PROVIDER="deepseek"))}
+        self.assertEqual(by_name["t2-llm"]["data"]["value"], "Bearer d")
         self.assertEqual(by_name["t2-sink-auth"]["data"]["name"], "X-Sink-Token")
 
 
