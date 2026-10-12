@@ -142,5 +142,76 @@ class ReplayTests(unittest.TestCase):
         self.assertTrue(output.exists())
 
 
+class HardenedFake(FakeN8n):
+    def wait_execution(self, workflow_id, after_id):
+        self.next_id += 1
+        return {"id": self.next_id, "started": "2026-10-12T00:00:00Z", "status": "success",
+                "data": {"resultData": {"runData": {
+                    run.HARDENED_LLM: [{"startTime": "2026-10-12T00:00:00Z",
+                                        "data": {"usage": {"prompt_tokens": 1000, "completion_tokens": 100}}}],
+                    "H13 Header Append": [{"startTime": "2026-10-12T00:00:01Z", "data": {}}]}}}}
+
+
+class HardenedReplayTests(ReplayTests):
+    def hardened_args(self, **extra):
+        values = dict(target="local", phase="hardened", baseline_mode="as-published", passes="AB",
+                      workflow=str(run.HARDENED), handler_workflow=str(run.HANDLER), sqlite="unused",
+                      manifest=str(self.manifest), inputs_dir=str(self.inputs), runs_dir=str(self.root / "runs"),
+                      cost_ledger=str(self.root / "cost_ledger.csv"), repaired_workflow="unused", start_sink=False)
+        values.update(extra)
+        return argparse.Namespace(**values)
+
+    def run_hardened(self, args, fake):
+        env = {"SINK_TOKEN": "sink", "T2_WEBHOOK_TOKEN": "webhook", "T2_WEBHOOK_PATH_HARDENED": "hpath",
+               "SINK_BASE_URL": "http://sink.invalid", "N8N_BASE_URL": "http://n8n.invalid", "RUN_USD_CAP": "0.25"}
+        hooks = []
+        with patch.dict(os.environ, env, clear=True), \
+                patch.object(run, "request_json", return_value=(200, {"ok": True})), \
+                patch.object(run, "submit", side_effect=lambda url, *values: hooks.append(url) or 200):
+            run_dir = run.run_replay(args, fake)
+        return run_dir, hooks
+
+    def test_hardened_publishes_handler_and_uses_config_model_and_prices(self):
+        fake = HardenedFake()
+        run_dir, hooks = self.run_hardened(self.hardened_args(), fake)
+        self.assertEqual(fake.calls, [("import", "t2ErrorHandler01"), ("publish", "t2ErrorHandler01"),
+                                      ("import", "t2HardenedFlow01"), ("publish", "t2HardenedFlow01"),
+                                      ("unpublish", "t2HardenedFlow01"), ("unpublish", "t2ErrorHandler01")])
+        self.assertTrue(all(url.endswith("/webhook/hpath") for url in hooks))
+        summary = json.loads((run_dir / "summary.json").read_text())
+        self.assertEqual(summary["model"], "deepseek-flash")
+        events = [json.loads(line) for line in (run_dir / "trace.jsonl").read_text().splitlines()]
+        llm = [e for e in events if e["node"] == run.HARDENED_LLM]
+        self.assertEqual(len(llm), 4)
+        self.assertAlmostEqual(llm[0]["usd"], (1000 * 0.30 + 100 * 1.20) / 1e6)
+        self.assertEqual({e["stage"] for e in events}, {"extract", "act"})
+        with (self.root / "cost_ledger.csv").open(newline="", encoding="utf-8") as f:
+            self.assertEqual(list(csv.DictReader(f))[0]["llm_calls"], "4")
+
+    def test_replay_of_counts_new_header_rows_in_existing_run(self):
+        run_dir, _ = self.run_hardened(self.hardened_args(), HardenedFake())
+        sink = run_dir / "sink"
+        sink.mkdir()
+        (sink / "invoices.csv").write_text("sink_seq,replay_input_id\n1,t2-001\n", encoding="utf-8")
+        self.run_hardened(self.hardened_args(replay_of=run_dir.name), HardenedFake())
+        summary = json.loads((run_dir / "summary.json").read_text())
+        self.assertEqual(summary["replay_check"]["new_header_rows"], 0)
+        self.assertEqual(summary["replay_check"]["pass"], "B")
+        self.assertTrue((run_dir / "replay_trace.jsonl").exists())
+
+    def test_stage_map_covers_hardened_nodes(self):
+        self.assertEqual(run.stage_for("H8 Schema Gate"), "validate")
+        self.assertEqual(run.stage_for("H10 Review?"), "decide")
+        self.assertEqual(run.stage_for("H15 Review Append"), "approve")
+        self.assertEqual(run.stage_for("H1 PDF SHA-256"), "intake")
+        self.assertEqual(run.stage_for(run.equivalent.LLM), "extract")
+
+    def test_credentials_are_built_in_memory_from_env(self):
+        payload = run.credential_payload({"T2_WEBHOOK_TOKEN": "w", "SINK_TOKEN": "s", "DEEPSEEK_API_KEY": "k"})
+        by_name = {c["name"]: c for c in payload}
+        self.assertEqual(by_name["t2-deepseek"]["data"], {"name": "Authorization", "value": "Bearer k"})
+        self.assertEqual(by_name["t2-sink-auth"]["data"]["name"], "X-Sink-Token")
+
+
 if __name__ == "__main__":
     unittest.main()

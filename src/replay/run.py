@@ -44,6 +44,73 @@ STAGES = {
 LEDGER_HEADER = ("run_id,run_phase,target,started_utc,ended_utc,model,llm_calls,"
                  "tokens_in,tokens_out,usd,run_usd_cap,capped_inputs".split(","))
 REPAIRED_BASELINE = Path("workflows/baseline/upstream/16643-repaired-to-run.json")
+EQUIVALENT_BASELINE = "workflows/baseline/upstream/16643-equivalent.json"
+HARDENED = Path("workflows/hardened/t2-hardened.json")
+HANDLER = Path("workflows/hardened/t2-error-handler.json")
+HARDENED_LLM = "H6 LLM Extract — DeepSeek"
+BASELINE_MODEL = "gpt-4o-mini-2024-07-18"
+CREDENTIAL_IDS = {"t2-openai": "t2OpenAiSmoke001", "t2-webhook-auth": "t2WebhookAuth001",
+                  "t2-sink-auth": "t2SinkAuth000001", "t2-deepseek": "t2DeepSeekKey001"}
+HARDENED_STAGES = (("H1 ", "intake"), ("H2 ", "intake"), ("H3 ", "extract"), ("H4 ", "extract"), ("H5 ", "extract"),
+                   ("H6 ", "extract"), ("H7 ", "extract"), ("H8 ", "validate"), ("H10 ", "decide"),
+                   ("H11 ", "act"), ("H12 ", "act"), ("H13 ", "act"), ("H14 ", "act"), ("H15 ", "approve"),
+                   ("H16 ", "record"), ("E ", "record"), ("0. ", "intake"))
+
+
+def stage_for(node):
+    if node in STAGES:
+        return STAGES[node]
+    for prefix, stage in HARDENED_STAGES:
+        if node.startswith(prefix):
+            return stage
+    return "record"
+
+
+def config_values(workflow):
+    """Return the hardened `0. Config` assignments (§3.2) as a dict."""
+    for node in workflow.get("nodes", []):
+        if node.get("name") == "0. Config":
+            return {a["name"]: a["value"] for a in node["parameters"]["assignments"]["assignments"]}
+    raise ValueError("hardened workflow has no 0. Config node")
+
+
+def load_env_file(path):
+    """Copy KEY=value lines into os.environ without overriding values already set. Values stay in memory."""
+    path = Path(path)
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip())
+
+
+def phase_settings(phase, workflow):
+    """Webhook path variable, credential names, model, prices, and LLM node name for one phase."""
+    if phase == "hardened":
+        cfg = config_values(workflow)
+        if float(cfg["run_usd_cap"]) != RUN_CAP:
+            raise ValueError("0. Config run_usd_cap must be 0.25")
+        return {"path_var": "T2_WEBHOOK_PATH_HARDENED", "model": cfg["llm_model"], "llm_node": HARDENED_LLM,
+                "credentials": ("t2-webhook-auth", "t2-sink-auth", "t2-deepseek"),
+                "price_in": float(cfg["llm_price_in_per_mtok"]), "price_out": float(cfg["llm_price_out_per_mtok"])}
+    return {"path_var": "T2_WEBHOOK_PATH_BASELINE", "model": BASELINE_MODEL, "llm_node": equivalent.LLM,
+            "credentials": tuple(name for _, name in equivalent.CREDENTIALS.values()),
+            "price_in": float(os.environ["LLM_PRICE_IN_PER_MTOK"]),
+            "price_out": float(os.environ["LLM_PRICE_OUT_PER_MTOK"])}
+
+
+def credential_payload(env):
+    """Local-target credentials (§3.6), built in memory from the environment."""
+    def header(cid, name, header_name, value):
+        return {"id": cid, "name": name, "type": "httpHeaderAuth", "data": {"name": header_name, "value": value}}
+    return [header(CREDENTIAL_IDS["t2-webhook-auth"], "t2-webhook-auth", "X-T2-Token", env["T2_WEBHOOK_TOKEN"]),
+            header(CREDENTIAL_IDS["t2-sink-auth"], "t2-sink-auth", "X-Sink-Token", env["SINK_TOKEN"]),
+            header(CREDENTIAL_IDS["t2-deepseek"], "t2-deepseek", "Authorization",
+                   "Bearer " + env.get("DEEPSEEK_API_KEY", "")),
+            {"id": CREDENTIAL_IDS["t2-openai"], "name": "t2-openai", "type": "openAiApi",
+             "data": {"apiKey": env.get("OPENAI_API_KEY", "")}}]
 
 
 def utc_now():
@@ -150,6 +217,10 @@ class LocalN8n:
         # /dev/stdin keeps target-specific substitutions out of the working tree.
         self._run(["docker", "exec", "-i", "n8n", "n8n", "import:workflow", "--input=/dev/stdin"],
                   json.dumps(workflow, ensure_ascii=False))
+
+    def import_credentials(self, credentials):
+        self._run(["docker", "exec", "-i", "n8n", "n8n", "import:credentials", "--input=/dev/stdin"],
+                  json.dumps(credentials))
 
     def publish(self, workflow_id):
         self._run(["docker", "exec", "-e", "N8N_SECURE_COOKIE=false", "n8n", "n8n",
@@ -307,13 +378,20 @@ def trace_events(execution, run_id, pass_name, input_id, price_in, price_out):
             events.append({"ts": entry.get("startTime") or execution.get("started") or utc_now(), "node": node,
                            "ok": not bool(error), "tokens": token_in + token_out, "usd": usd,
                            "run_id": run_id, "pass": pass_name, "input_id": input_id,
-                           "execution_id": execution["id"], "stage": STAGES.get(node, "record"),
+                           "execution_id": execution["id"], "stage": stage_for(node),
                            "tokens_in": token_in, "tokens_out": token_out,
                            **({"error": str(error)} if error else {})})
     return events or [{"ts": execution.get("started") or utc_now(), "node": "runner", "ok": False,
                        "tokens": 0, "usd": 0.0, "run_id": run_id, "pass": pass_name,
                        "input_id": input_id, "execution_id": execution["id"], "stage": "record",
                        "error": "audit_gap"}]
+
+
+def _count_rows(path):
+    if not Path(path).exists():
+        return 0
+    with open(path, newline="", encoding="utf-8") as f:
+        return sum(1 for _ in csv.DictReader(f))
 
 
 def load_manifest(manifest):
@@ -325,39 +403,62 @@ def run_replay(args, n8n=None):
     if args.target != "local":
         raise ValueError("T7 permits the local target only")
     env = os.environ
-    required = ("SINK_TOKEN", "T2_WEBHOOK_TOKEN", "T2_WEBHOOK_PATH_BASELINE", "SINK_BASE_URL",
-                "LLM_PRICE_IN_PER_MTOK", "LLM_PRICE_OUT_PER_MTOK")
+    hardened = args.phase == "hardened"
+    path_var = "T2_WEBHOOK_PATH_HARDENED" if hardened else "T2_WEBHOOK_PATH_BASELINE"
+    required = ("SINK_TOKEN", "T2_WEBHOOK_TOKEN", path_var, "SINK_BASE_URL") + (
+        () if hardened else ("LLM_PRICE_IN_PER_MTOK", "LLM_PRICE_OUT_PER_MTOK"))
     missing = [name for name in required if not env.get(name)]
     if missing:
         raise ValueError("missing required runner configuration")
-    price_in, price_out = float(env["LLM_PRICE_IN_PER_MTOK"]), float(env["LLM_PRICE_OUT_PER_MTOK"])
     if float(env.get("RUN_USD_CAP", RUN_CAP)) != RUN_CAP:
         raise ValueError("RUN_USD_CAP must be 0.25")
-    source = Path(args.workflow)
+    source = Path(args.workflow or (HARDENED if hardened else EQUIVALENT_BASELINE))
     if args.phase == "baseline" and args.baseline_mode == "repaired":
         source = materialize_repaired_baseline(source, Path(args.repaired_workflow))
     workflow = json.loads(source.read_text(encoding="utf-8"))
+    settings = phase_settings(args.phase, workflow)
+    price_in, price_out = settings["price_in"], settings["price_out"]
     n8n = n8n or LocalN8n(args.sqlite)
-    credential_names = tuple(name for _, name in equivalent.CREDENTIALS.values())
-    workflow = equivalent.bind_credentials(workflow, n8n.credential_ids(credential_names))
-    workflow = equivalent.substitute(workflow, env["SINK_BASE_URL"], env["T2_WEBHOOK_PATH_BASELINE"])
+    ids = n8n.credential_ids(settings["credentials"])
+    workflow = equivalent.bind_credentials(workflow, ids)
+    workflow = equivalent.substitute(workflow, env["SINK_BASE_URL"], env[path_var])
+    handler = None
+    if hardened:
+        handler = json.loads(Path(getattr(args, "handler_workflow", None) or HANDLER).read_text(encoding="utf-8"))
+        handler = equivalent.substitute(equivalent.bind_credentials(handler, ids), env["SINK_BASE_URL"], "unused")
     workflow_sha = hashlib.sha256(source.read_bytes()).hexdigest()
-    run_id = "{}-local-{}-{}".format(args.phase, datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), "nogit")
-    run_dir = Path(args.runs_dir) / run_id
-    run_dir.mkdir(parents=True)
-    trace_path = run_dir / "trace.jsonl"
+    replay_of = getattr(args, "replay_of", None)
+    if replay_of:
+        # I-8: replay pass B into an existing run's sink; record new header rows in that run's summary.
+        run_id = replay_of
+        run_dir = Path(args.runs_dir) / run_id
+        if not (run_dir / "sink").is_dir():
+            raise ValueError("replay-of run has no sink")
+        args.passes = "B"
+        trace_path = run_dir / "replay_trace.jsonl"
+    else:
+        run_id = "{}-local-{}-{}".format(args.phase, datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), "nogit")
+        run_dir = Path(args.runs_dir) / run_id
+        run_dir.mkdir(parents=True)
+        trace_path = run_dir / "trace.jsonl"
+    headers_before = _count_rows(run_dir / "sink" / "invoices.csv")
     started = utc_now()
     sink_process = None
     if getattr(args, "start_sink", True):
         sink_process = LocalSink(run_dir / "sink", env["SINK_TOKEN"], int(env.get("SINK_PORT", "8787")))
         sink_process.start()
-    webhook = env["N8N_BASE_URL"].rstrip("/") + "/webhook/" + env["T2_WEBHOOK_PATH_BASELINE"]
+    webhook = env["N8N_BASE_URL"].rstrip("/") + "/webhook/" + env[path_var]
     # The workflow runs in Docker and uses SINK_BASE_URL.  The runner runs on
     # the host, where its freshly started sink is reachable on loopback.
     sink = "http://127.0.0.1:{}".format(env.get("SINK_PORT", "8787"))
     rows, total_usd, capped, published = load_manifest(args.manifest), 0.0, 0, False
     all_events = []
+    handler_published = False
     try:
+        if handler is not None:
+            n8n.import_workflow(handler)
+            handler_published = True
+            n8n.publish(handler["id"])  # n8n runs an error workflow only when it is published.
         n8n.import_workflow(workflow)
         published = True
         n8n.publish(workflow["id"])
@@ -392,6 +493,8 @@ def run_replay(args, n8n=None):
     finally:
         if published:
             n8n.unpublish(workflow["id"])
+        if handler_published:
+            n8n.unpublish(handler["id"])
         if sink_process is not None:
             sink_process.stop()
     with trace_path.open("w", encoding="utf-8") as f:
@@ -399,10 +502,17 @@ def run_replay(args, n8n=None):
             f.write(json.dumps(event, separators=(",", ":")) + "\n")
     tokens_in = sum(event.get("tokens_in", 0) for event in all_events)
     tokens_out = sum(event.get("tokens_out", 0) for event in all_events)
-    summary = {"run_id": run_id, "phase": args.phase, "target": "local", "workflow_sha256": workflow_sha,
-               "n8n_version": "2.22.5", "model": "gpt-4o-mini-2024-07-18", "started": started,
-               "ended": utc_now(), "inputs": len(rows), "passes": args.passes, "tokens": tokens_in + tokens_out,
-               "usd": total_usd, "capped": capped}
+    llm_calls = sum(event["node"] == settings["llm_node"] for event in all_events)
+    if replay_of:
+        summary = json.loads((run_dir / "summary.json").read_text(encoding="utf-8"))
+        summary["replay_check"] = {"started": started, "ended": utc_now(), "pass": "B", "inputs": len(rows),
+                                   "new_header_rows": _count_rows(run_dir / "sink" / "invoices.csv") - headers_before,
+                                   "llm_calls": llm_calls, "usd": total_usd}
+    else:
+        summary = {"run_id": run_id, "phase": args.phase, "target": "local", "workflow_sha256": workflow_sha,
+                   "n8n_version": "2.22.5", "model": settings["model"], "started": started,
+                   "ended": utc_now(), "inputs": len(rows), "passes": args.passes, "tokens": tokens_in + tokens_out,
+                   "usd": total_usd, "capped": capped}
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     ledger = Path(args.cost_ledger)
     write_header = not ledger.exists()
@@ -410,9 +520,9 @@ def run_replay(args, n8n=None):
         writer = csv.DictWriter(f, fieldnames=LEDGER_HEADER)
         if write_header:
             writer.writeheader()
-        writer.writerow({"run_id": run_id, "run_phase": args.phase, "target": "local", "started_utc": started,
-                         "ended_utc": summary["ended"], "model": summary["model"],
-                         "llm_calls": sum(event["node"] == equivalent.LLM for event in all_events),
+        writer.writerow({"run_id": run_id + ("-replayB" if replay_of else ""), "run_phase": args.phase,
+                         "target": "local", "started_utc": started,
+                         "ended_utc": utc_now(), "model": settings["model"], "llm_calls": llm_calls,
                          "tokens_in": tokens_in, "tokens_out": tokens_out, "usd": total_usd,
                          "run_usd_cap": RUN_CAP, "capped_inputs": capped})
     return run_dir
@@ -425,7 +535,10 @@ def main(argv=None):
     parser.add_argument("--phase", required=True, choices=("baseline", "hardened"))
     parser.add_argument("--baseline-mode", default="as-published", choices=("as-published", "repaired"))
     parser.add_argument("--passes", default="AB", choices=("A", "AB"))
-    parser.add_argument("--workflow", default="workflows/baseline/upstream/16643-equivalent.json")
+    parser.add_argument("--workflow", default=None, help="default: baseline equivalent or hardened by phase")
+    parser.add_argument("--handler-workflow", default=str(HANDLER))
+    parser.add_argument("--replay-of", default=None, help="I-8: replay pass B into this existing run's sink")
+    parser.add_argument("--env-file", default=".env")
     parser.add_argument("--repaired-workflow", default=str(REPAIRED_BASELINE))
     parser.add_argument("--sqlite", required=True)
     parser.add_argument("--manifest", default="evals/inputs/manifest.csv")
@@ -434,16 +547,12 @@ def main(argv=None):
     parser.add_argument("--cost-ledger", default="evals/cost_ledger.csv")
     parser.add_argument("--no-start-sink", dest="start_sink", action="store_false")
     args = parser.parse_args(argv)
+    load_env_file(args.env_file)
     if args.command == "setup":
         if args.target != "local":
             raise ValueError("T7 permits the local target only")
-        source = Path(args.workflow)
-        if args.phase == "baseline" and args.baseline_mode == "repaired":
-            source = materialize_repaired_baseline(source, Path(args.repaired_workflow))
-        workflow = json.loads(source.read_text(encoding="utf-8"))
-        workflow = equivalent.substitute(workflow, os.environ.get("SINK_BASE_URL", ""),
-                                         os.environ.get("T2_WEBHOOK_PATH_BASELINE", ""))
-        LocalN8n(args.sqlite).import_workflow(workflow)
+        # §3.6 local target: credentials are created in memory from the environment, never written to disk.
+        LocalN8n(args.sqlite).import_credentials(credential_payload(os.environ))
     else:
         run_replay(args)
     return 0
