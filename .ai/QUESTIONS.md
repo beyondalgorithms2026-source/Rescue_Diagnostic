@@ -108,7 +108,11 @@ Consequences (architecture session):
   (node 3 URL + credential + model; prompt unchanged) and a baseline re-run (about 100 calls). The gpt-4o-mini run stays
   committed as evidence. Owner to confirm this reading. If not confirmed, findings must disclose the model difference.
 - Model id: `deepseek-flash` could not be confirmed from here. The owner confirms the exact id.
-Still needed: DeepSeek prices; confirm the baseline re-run; confirm the model id.
+Resolved from DeepSeek's official docs (2026-10-12): model id `deepseek-flash` (DeepSeek-V4.1-Flash) is valid.
+Prices per 1M tokens, cache miss: input $0.15 off-peak / $0.30 peak; output $0.60 off-peak / $1.20 peak. The Config
+node uses the peak prices so the cap never under-counts. DeepSeek documents `response_format: json_object` only.
+Still needed from the owner: a real DEEPSEEK_API_KEY in `.env` (the current value is an 8-character placeholder;
+DeepSeek answers 401), and confirmation of the DeepSeek baseline re-run.
 
 ## Q-5 Git — blocks the first commit
 This folder is not a git repository. Thin Ledger Session A says the human runs `git init`. Public remote name/visibility is a later human gate.

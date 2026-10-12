@@ -104,6 +104,17 @@ class HardenedJavaScriptTests(unittest.TestCase):
             self.assertEqual(got, expected, value)
             self.assertEqual(got, python, value)
 
+    def test_js_sha256_matches_hashlib(self):
+        import hashlib
+        code = {n["name"]: n for n in load(HARDENED)["nodes"]}["H1 PDF SHA-256"]["parameters"]["jsCode"]
+        block = code[code.index("// SHA256-BEGIN"):code.index("// SHA256-END")]
+        pdf = Path("evals/inputs/t2-047.pdf").read_bytes()
+        samples = [b"", b"abc", bytes(range(256)) * 3, pdf]
+        hexes = [s.hex() for s in samples]
+        out = self.run_node(block + "\nprocess.stdout.write(JSON.stringify(" + json.dumps(hexes) +
+                            ".map((h) => sha256Hex(Uint8Array.from(Buffer.from(h, 'hex'))))));")
+        self.assertEqual(out, [hashlib.sha256(s).hexdigest() for s in samples])
+
     def test_report_escapes_injected_html(self):
         code = {n["name"]: n for n in load(HARDENED)["nodes"]}["H14 Report Build"]["parameters"]["jsCode"]
         gate = {"run_id": "r", "submitter_email": "ap@example.com", "report_recipient_allowlist": "example.com",
