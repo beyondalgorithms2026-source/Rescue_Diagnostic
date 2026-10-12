@@ -95,6 +95,21 @@ Answer (2026-10-06): option (c). Two baselines. Do not hide either defect.
 The 100-row scorecard compares this repaired baseline with the hardened workflow.
 Do not open another template. Do not rebuild the graph.
 
+## Q-8 Which model for the hardened phase? — blocks T11
+Found 2026-10-12: T9 put `deepseek-flash` (credential `t2-deepseek`) in the hardened workflow. The scored baseline (T8) used
+`gpt-4o-mini-2024-07-18`. No ADR or answer recorded this change. If the two phases use different models, a field-accuracy
+difference can come from the model and not from the controls. The `0. Config` node still holds the OpenAI prices 0.15 / 0.60.
+
+Answer (2026-10-12, owner in chat): "keep using DeepSeek for all purpose."
+Recorded as: DeepSeek is the model for every model call from now on.
+Consequences (architecture session):
+- Prices: the Config node and `.env` need DeepSeek's real per-million-token input/output prices. Not guessed. Still needed from the owner.
+- Baseline: "all purpose" is read as "the scored baseline also uses DeepSeek". That needs a new disclosed baseline swap
+  (node 3 URL + credential + model; prompt unchanged) and a baseline re-run (about 100 calls). The gpt-4o-mini run stays
+  committed as evidence. Owner to confirm this reading. If not confirmed, findings must disclose the model difference.
+- Model id: `deepseek-flash` could not be confirmed from here. The owner confirms the exact id.
+Still needed: DeepSeek prices; confirm the baseline re-run; confirm the model id.
+
 ## Q-5 Git — blocks the first commit
 This folder is not a git repository. Thin Ledger Session A says the human runs `git init`. Public remote name/visibility is a later human gate.
 Answer (2026-10-05): git init done by hand. No public remote yet.

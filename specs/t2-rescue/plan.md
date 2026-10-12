@@ -52,6 +52,19 @@ Done: tests pass; `evals/scorecard.csv` untouched.
 - Dry run first on `local` (not committed), then the scored run on `online`. Commit only the online run dir.
 - Human gate: read ≥15 traces before any findings prose.
 
+## T8a — scorer fix + baseline re-score
+Files: `src/score/score.py`, `tests/test_score.py`, `tests/fixtures/stub_run/**` (only if a stub needs the real stamps),
+`evals/scorecard.csv`, ledger files.
+- Pass of a sink row = `replay_pass`; request log = `pass`; trace = `pass`. No default to "A".
+- `write_count` per §4.3: rows in `invoices` (both passes) whose `replay_input_id` shares this input's gold `dedupe_key`;
+  null key → this input's rows only.
+- `retry_storm` per amended §6: > 3 failed attempts (sink status ≥ 500, LLM trace `ok=false`) per target, input, pass.
+- `unbounded_spend` per amended §6: never fired by a workflow cap.
+- Tests: one test per fix using sink rows stamped exactly as `src/sink/server.py` stamps them
+  (`replay_input_id`, `replay_pass`), including a baseline invoice row with no `dedupe_key` column.
+- Re-score `baseline-local-20261007T060333Z-nogit`. No n8n run, no model call. Report before/after code counts in HANDOFF.
+Done: tests pass; scorecard has 50 rows with the same header; the change in each code count is explained.
+
 ## T9 / T10 — hardened
 - Graph §3.1, config §3.2, schema §3.3, tables §3.4, norms §3.5. `static_checks --strict` clean.
 - Notes field is stored, never sent to the LLM. Report recipient allowlist. HTML-escape everything interpolated.

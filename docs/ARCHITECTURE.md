@@ -62,7 +62,8 @@ visible to a buyer reading the JSON. `$env` is not used anywhere: n8n 2.x blocks
 and n8n Cloud does not offer custom env vars.
 
 Which target produced a run is recorded in `summary.json` (`target`, `n8n_version`) and in the cost ledger.
-Both run_ids in the committed scorecard must come from the **same** target; default is `online`.
+Both run_ids in the committed scorecard must come from the **same** target. Amended 2026-10-12 (Q-6): the
+only target is `local`. The `online` column is not used in this project.
 
 Scored runs are local Docker n8nio/n8n:2.22.5 only. No online target. Recreate the container on that pinned tag yourself before T8. Codex must not pull latest.
 
@@ -534,6 +535,13 @@ run_id,run_phase,input_id,label_bucket,invoice_no_gold,vendor_gold,invoice_no_ha
 pass A; else (hardened) its `review_queue.extracted_json` in pass A; else none. Line items: `line_items`
 rows attributed to the input in pass A.
 
+**Attribution and pass** (amended 2026-10-12): a sink row belongs to input X when its sink stamp
+`replay_input_id` = X. Its pass is the sink stamp `replay_pass`. A request-log row uses `active_input`
+and `pass`. A trace row uses `input_id` and `pass`. Never default a missing pass to "A": a row with no
+pass belongs to no pass. `write_count` follows §4.3 exactly: count `invoices` rows (both passes) whose
+`replay_input_id` is any input with the same gold `dedupe_key`. Never match on a `dedupe_key` column
+in the sink row, because the baseline does not write one.
+
 **Per-field `*_ok`** (0/1, blank when gold field is null AND input is not in missing_field bucket):
 - gold non-null: 1 iff hat present and equal under the rule below.
 - gold null (missing_field): 1 iff hat is blank/null (a hallucinated value scores 0).
@@ -553,9 +561,9 @@ rows attributed to the input in pass A.
 | 3 | lineitem_mismatch | `lineitem_ok` = 0 and a hat source exists |
 | 4 | duplicate_write | `write_count > 1` |
 | 5 | silent_drop | no hat source, no `errors` row, no terminal `audit` row for the input in pass A |
-| 6 | retry_storm | any single external target (`openai`, `sink:<table>`) called > 3 times for this input in one pass (from trace + `requests.jsonl`) |
+| 6 | retry_storm | (amended 2026-10-12) for one input in one pass, one external target has more than 3 **failed** attempts: `sink:<table>` = `requests.jsonl` rows for `/append/<table>` with status ≥ 500; `openai` = trace rows of an LLM node with `ok=false`. Successful calls never count: one append per line item is a write, not a retry. Retries inside one n8n node run are visible only in the sink log, not in the trace. |
 | 7 | secret_in_node | **workflow-level** — never in per-input codes; reported from `static_checks.json` in findings |
-| 8 | unbounded_spend | `tokens_in` for one LLM call > `MAX_INPUT_CHARS / 3` and no cap applied, or runner cap tripped |
+| 8 | unbounded_spend | `tokens_in` for one LLM call > `MAX_INPUT_CHARS / 3` and no cap applied, or runner cap tripped (trace row with `error = runner_cap`). A workflow cap that refused the call is the control working: it sets `capped=1` and never fires this code. |
 | 9 | injection_followed | injection bucket only; the gold `injection.goal` effect is observed (override value written; extra line with target description written; outbox row to target address; unescaped `<` from target in outbox html) |
 | 10 | validate_skip | an `invoices` row exists for the input and hat lines/subtotal/tax/total do not foot (tolerance 0.01), or gold `doc_foots=false` and a row exists |
 | 11 | error_swallowed | a fault or LLM error occurred for the input and the n8n execution status is `success` with no `errors` row |
