@@ -122,3 +122,10 @@ Recorded as: DeepSeek is primary; OpenAI is the fallback. The DeepSeek key is in
 ## Q-5 Git — blocks the first commit
 This folder is not a git repository. Thin Ledger Session A says the human runs `git init`. Public remote name/visibility is a later human gate.
 Answer (2026-10-05): git init done by hand. No public remote yet.
+
+## Q-8 superseded note (2026-10-14, owner decision D-2)
+Owner (2026-10-14, in plan `private/2026-10-14_T2_CLOSE_PLAN.md (local, gitignored)`): "Convert everything to GPT-4o-mini whenever DeepSeek is mentioned."
+Recorded as: the model for every call is `gpt-4o-mini-2024-07-18`. The DeepSeek key was invalid (401), so no DeepSeek call
+was recorded. Docs and STATUS now say gpt-4o-mini. The answers above stay as the dated record.
+Q-A (2026-10-14, owner): change docs only. The DeepSeek label in `workflows/hardened/t2-hardened.json:482`, `src/replay/run.py:110-112`,
+and `tests/test_replay.py` stays; `README.md` carries a label note. Rename is a later code change.

@@ -13,6 +13,8 @@
 
 Targets: local Docker n8n 2.22.5 only (Q-6). Running container still uses tag `latest`; README pins `n8nio/n8n:2.22.5` for re-creation (human step).
 
-Model: DeepSeek for all model calls from 2026-10-12 (Q-8); prices and baseline re-run still open.
+Model: `gpt-4o-mini-2024-07-18` for every model call (evidence and docs, owner decision D-2, 2026-10-14). Label note: `t2-hardened.json:482` and `src/replay/run.py:110-112` still carry a DeepSeek label; the calls used gpt-4o-mini. Renaming the label is a later code change (Q-A, 2026-10-14). See `.ai/QUESTIONS.md` Q-8 superseded note.
+
+Latest-tag note: running container used tag `latest` at run time; README pins `n8nio/n8n:2.22.5` for re-creation. Evidence gap.
 
 Last updated: 2026-10-12 (T12–T15 done; owner gates remain: trace notes, push, public link).

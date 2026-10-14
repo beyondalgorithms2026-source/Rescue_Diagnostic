@@ -1,0 +1,5 @@
+title: "Rescue Diagnostic — by Spanfold"
+description: "Before and after: an n8n invoice template on 50 synthetic invoices. Synthetic data, public template, not a client deployment."
+theme: jekyll-theme-minimal
+exclude:
+  - plans/

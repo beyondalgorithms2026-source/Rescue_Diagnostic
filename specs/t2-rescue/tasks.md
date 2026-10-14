@@ -16,9 +16,22 @@ Each task's acceptance is in `plan.md` under the same id. Do not start a task wh
 - [x] **T8a** Scorer fix + baseline re-score (ARCHITECTURE §6 amended 2026-10-12): pass from `replay_pass`, `write_count` per §4.3, `retry_storm` on failed attempts only, `unbounded_spend` not on workflow caps. Re-score the T8 run into `evals/scorecard.csv` (50 rows). No model call. — deps: T8
 - [x] **T10a** Scorer: `injection_followed` per §6 code 9 (four goals) and cap detection from `errors.code = reject:capped`. Baseline re-scored: injection_followed 2 (t2-045, t2-046). — deps: T8a
 - [x] **T10** Hardened part 2: validate → decide → act (dedupe, header-as-commit) → approve → record (H8–H16), recipient allowlist, HTML escape; JS normalizer passes §3.5 vectors (test via exported code string run under `node`). LLM error-branch drill with invalid key, noted in commit message. — deps: T9
-- [x] **T11a** Runner support for the hardened phase: error-handler import/publish, `T2_WEBHOOK_PATH_HARDENED`, credentials `t2-webhook-auth`/`t2-sink-auth`/`t2-deepseek` built in memory by `setup`, model and prices from `0. Config`, H-node stage map, `--replay-of` for I-8, `--env-file`. Fake-n8n tests. — deps: T10
+- [x] **T11a** Runner support for the hardened phase: error-handler import/publish, `T2_WEBHOOK_PATH_HARDENED`, credentials `t2-webhook-auth`/`t2-sink-auth`/`t2-deepseek` (label; calls used gpt-4o-mini) built in memory by `setup`, model and prices from `0. Config`, H-node stage map, `--replay-of` for I-8, `--env-file`. Fake-n8n tests. — deps: T10
 - [x] **T11** Hardened run on local (Q-6; same target as T8); re-score both phases into `evals/scorecard.csv`; then a third hardened pass-B-only replay against the same sink proves I-8 (0 new header rows) — record in summary.json. — deps: T10, T8a, Q-8
 - [x] **T12** Review (different family from the T9/T10 author): security review of hardened JSON + scorer; findings only, file:line, in the commit message of a docs-only commit or `.ai/HANDOFF.md`. — deps: T11
 - [x] **T13** `evals/findings.md` one-pager: rollups, per-code table, OWASP mapping, residual risk (frontier). — deps: T12
 - [x] **T14** README results table + `README.md` §Loom script (4 min) filled from findings (cheap prose). Public link is a human gate. — deps: T13
 - [x] **T15** *(optional, not DoD)* Sheets adapter notes in README §7-equivalent. — deps: T13
+
+## T2 close (2026-10-14) — plan `private/2026-10-14_T2_CLOSE_PLAN.md`
+- [x] **C1** Demo page as Markdown for GitHub Pages: `docs/index.md`, `docs/_config.yml` (plan 1.2–1.4). Numbers from repo source files; check against them is a manual step.
+- [x] **C2** Apache-2.0 `LICENSE` added (downloaded from apache.org, unchanged) (plan 3.4, owner Q-B).
+- [x] **C3** DeepSeek → gpt-4o-mini in docs and STATUS; code label note added to README; code untouched (plan 3.1, Q-A).
+- [x] **C4** Spanfold brand in `THIN-LEDGER-v0.1.md` and README header; GitHub owner kept (plan 3.5).
+- [x] **C5** README Loom script: 7 segments, 3–5 min (plan 2.1).
+- [x] **C6** Snapshot PNG 1000×750 (4:3) and Upwork item + profile drafts (plan 5.2–6.2).
+- [ ] **C7** Owner: enable GitHub Pages (`main` / `/docs`) (plan 1.5). Owner gate.
+- [ ] **C8** Owner or agent: set repo description (plan 3.6). Owner gate; outward-facing.
+- [ ] **C9** Owner: record Loom, paste link into `docs/index.md` (plan 2.4).
+- [ ] **C10** Owner: approve push and tag `v1.0.1` (plan 7.4).
+- [ ] **C11** Final link check on the live demo page (plan 7.5).

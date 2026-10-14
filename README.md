@@ -1,5 +1,7 @@
 # Rescue Teardown: n8n invoice-extraction template 16643
 
+by **Spanfold** · Rescue Diagnostic → Fix & Harden · licence Apache-2.0 (see [`LICENSE`](LICENSE))
+
 A before/after of the n8n community template **"Extract and validate invoice PDFs with OpenAI, Google Sheets,
 and Gmail"** ([n8n.io/workflows/16643](https://n8n.io/workflows/16643-extract-and-validate-invoice-pdfs-with-openai-google-sheets-and-gmail/),
 by creator `isawow`). We replay 50 labelled invoices through the template as published, record what goes
@@ -38,7 +40,7 @@ Status: **runs complete** — results below, full write-up in [`evals/findings.m
 
 ## How to replay
 
-Requires Docker (n8n), Python 3.9+, an OpenAI API key (or a DeepSeek key, see below). No Google account needed:
+Requires Docker (n8n), Python 3.9+, an OpenAI API key (model `gpt-4o-mini-2024-07-18`). No Google account needed:
 writes go to a local append-only sink (`src/sink/`) that stands in for Sheets and Gmail. Results were produced on a
 local Docker n8n; you replay on yours with the same workflow files. Model output can vary slightly; formats and the
 no-duplicate-rows property should not.
@@ -78,8 +80,13 @@ python3 -m src.score.score --baseline <baseline_run_id> --hardened <hardened_run
 
 `setup` creates the local n8n credentials from `.env` in memory. The last replay command sends pass B again into the same
 store and records `new_header_rows` in that run's `summary.json`. The hardened model is set in the `0. Config` node
-(`llm_base_url`, `llm_model`, prices); to use DeepSeek, set those to `https://api.deepseek.com` / `deepseek-flash` with
-DeepSeek's prices and run with `T2_LLM_PROVIDER=deepseek`. n8n pin: `n8nio/n8n:2.22.5`. Spend cap: $0.25 per run.
+(`llm_base_url`, `llm_model`, prices) and are set to `gpt-4o-mini-2024-07-18` via api.openai.com.
+n8n pin: `n8nio/n8n:2.22.5`. Spend cap: $0.25 per run.
+
+> **Label note.** `workflows/hardened/t2-hardened.json` (line 482) and `src/replay/run.py` (lines 110–112) still carry a
+> DeepSeek label and credential name (`t2-deepseek`, `T2_LLM_PROVIDER=deepseek`). That label is wrong: every recorded call
+> used `gpt-4o-mini-2024-07-18`. The label is left in place so the workflow file matches the committed evidence byte for
+> byte; it will be renamed in a later code change.
 
 ## Results
 
@@ -101,22 +108,20 @@ As published, the template does not run at all: node 2 reads the wrong binary ke
 (`workflows/baseline/DIFF.md`). Residual risk, the OWASP LLM mapping, and the label caveats are in
 [`evals/findings.md`](evals/findings.md).
 
-## Loom script (≈ 4 min)
+## Loom script (3–5 min, 7 segments)
 
-1. **0:00 – 0:30 · The promise.** "This is a popular free n8n template: upload an invoice PDF, AI extracts it, it logs to
-   Sheets and emails a verified report. I replayed 50 synthetic invoices through it."
-2. **0:30 – 1:10 · It does not run.** Show `DIFF.md` smoke table: node 2 reads binary `data`, the form stores
-   `Invoice_PDF`; node 3 puts PDF text outside the JSON string. "Out of the box, nothing is extracted."
-3. **1:10 – 2:00 · Repaired to run, it still fails.** Two minimal repairs, then the baseline scorecard: 48 duplicate rows
-   on resubmission, tax never captured, 3 invoices lost silently, no audit trail, two PDF injections overwrote invoice
-   numbers. The "Verified" banner checks fields that are never there.
-4. **2:00 – 3:00 · The hardened workflow.** Walk the seven stages: intake guard and hash, size and spend caps, schema gate
-   and totals check, review queue, dedupe key with the header row as commit marker, escaped report, audit row per invoice.
-5. **3:00 – 3:30 · Proof.** Replay the same 50: 0 duplicate rows; replay pass B again: 0 new rows; 49 of 50 clean;
-   58 model calls instead of 100.
-6. **3:30 – 3:50 · What is still open.** One PDF injection still changed an invoice number; dedupe is not atomic under
-   concurrency; the n8n database keeps the webhook token. "Hardening reduces risk; it does not remove it."
-7. **3:50 – 4:00 · Offer.** "If your automation looks like this, a Rescue Diagnostic finds these failures in your flow."
+Each segment: the screen to show, what to run beforehand, the spoken line, and the fallback if a live run fails.
+No live API run is needed: every segment reads saved outputs. A live run is capped at 3 invoices and must be costed first.
+
+| Segment | Screen | Set up before recording | Spoken line | Fallback |
+|---|---|---|---|---|
+| 1. Problem (0:00–0:30) | Demo page top | Open `docs/index.md` (GitHub Pages) | "A supplier invoice arrives as a PDF. The n8n template reads it with an LLM and writes it to a sheet. I tested what goes wrong." | Static page |
+| 2. Original fails (0:30–1:30) | `evals/scorecard.csv`, baseline rows for t2-001, t2-023, t2-046 | Filter the CSV to `run_phase=baseline` | "On these three invoices the original writes duplicates, bad totals, and in one case an attacker's invoice number." | Saved scorecard |
+| 3. Hardened handles the same (1:30–2:30) | Same three IDs, hardened rows | Filter to `run_phase=hardened` | "Same invoices, hardened version. t2-001 is written once. t2-023 is sent to a person. t2-046 still gets the attacker's number, and I say so." | Saved run `hardened-local-20261012T133818Z-nogit` |
+| 4. Scorecard (2:30–3:10) | `evals/findings.md` before/after table | Open file | "49 of 50 clean. 0 duplicate rows. Replay writes nothing new. 58 model calls instead of 100." | Saved findings |
+| 5. One safeguard (3:10–3:40) | `summary.json`, `replay_check` block | Open file | "I sent the same 50 again into the same store. Zero new header rows. The header row is written last and is the commit marker." | Saved summary |
+| 6. Limits (3:40–4:20) | Demo page limitations section | Open | "Synthetic data, public template, not a client deployment. One injection still changed a value. Dedupe is not atomic under concurrency." | Static page |
+| 7. Next step (4:20–4:40) | Demo page contact section | Open | "On a client workflow I would start with an intake check and a human-review gate, then measure it the same way." | Static page |
 
 ## Google Sheets adapter (optional, not replayed)
 

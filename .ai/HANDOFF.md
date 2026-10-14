@@ -1,38 +1,21 @@
 # Current handoff
-Task: T12 complete — review of the hardened workflow, scorer, and runner (findings only).
-Reviewer: Claude Opus 5.5 in a separate review pass. Same model family as the T10/T11 author. ROUTING asks for a
-different family; the owner asked to finish all steps in Claude. Findings must disclose this. A cross-family review
-(Codex/GPT) is still recommended before the public link.
+Task: T2 close (owner plan 2026-10-14). Docs, licence, brand, demo Markdown, Loom script, and drafts done. See `specs/t2-rescue/tasks.md` § T2 close.
 
-## Merge-blockers
-- B-1 FIXED in T11 (`e8a28ff`): `workflows/hardened/t2-hardened.json` H12 Line Append + `retryOnFail` re-ran the whole node,
-  so one 503 duplicated 7 line rows (t2-022, run `hardened-local-20261012T132928Z-nogit`, 15 rows for 8 lines).
-  Fix: `H12 Loop Lines` (line 1036), batch size 1. Re-run `...133818Z`: 8 rows. No open blockers.
+## Owner gates left (C7–C11)
+- Enable GitHub Pages: Settings → Pages → Deploy from a branch → `main` → `/docs`.
+- Set repo description (text in plan § 3.6).
+- Record the Loom and paste its link into `docs/index.md`.
+- Approve push of `main` and tag `v1.0.1`.
+- Then the agent re-checks the live demo page and every link on it.
 
-## Not blockers — disclose in findings
-- R-1 `src/score/score.py:239`: `error_swallowed` reads `summary.execution_status`, which the runner never writes. Code 11
-  can never fire in either phase. Findings must say code 11 is not measured.
-- R-2 `workflows/hardened/t2-hardened.json:97` (H1): `run_id` comes from the caller header `X-Replay-Run-Id`. A caller with
-  the webhook token can start a new run id per request and reset the per-run spend cap (ADR-002 consequence).
-- R-3 n8n stores webhook request headers, including `X-T2-Token`, in its own execution data (seen in the T10 drill).
-  Anyone who can read the n8n database can read the token. Prune execution data or rotate the token.
-- R-4 `t2-hardened.json:490` (H6): `retryOnFail` also retries 4xx (401/400). Bounded at 3, but wasted calls.
-- R-5 `t2-hardened.json:698` (H11): lookup-then-append is not atomic (ADR-001). Replay is sequential, so not exercised.
-- R-6 `t2-hardened.json:77`: the recipient allowlist is by domain. Any address at an allowed domain gets reports.
-- R-7 Injection: t2-046 (PDF text) still overwrote the invoice number in the hardened run. Schema and foot checks cannot
-  detect a consistent override (ARCHITECTURE §3.7).
-- R-8 `src/score/score.py:226`: `unbounded_spend` per-call threshold is 13,333 input tokens. Baseline oversized calls were
-  about 9,800 tokens each, so the code did not fire, although the 4 oversized inputs used 65% of baseline input tokens.
-- R-9 `src/replay/run.py:515`: `n8n_version` is written as the pinned constant, not read from the instance.
-- R-10 Gold labels: t2-015, t2-020 (form currency differs from document) and t2-023, t2-024 (document does not foot) have
-  `expect_outcome: committed`; ARCHITECTURE §5.3/§3.1 route them to review, which the hardened run did. t2-040 has a blank
-  form currency; hardened rejects at intake (gold: review). These are fixture-label errors, not workflow errors.
+## Decisions recorded 2026-10-14
+- D-1 demo = Markdown on GitHub Pages (no HTML file).
+- D-2 model in docs = `gpt-4o-mini-2024-07-18`. Code label still DeepSeek (Q-A: docs only).
+- D-3 licence = Apache-2.0 (`LICENSE`). Brand = Spanfold. GitHub owner unchanged.
 
-## Checks
-56 unit tests OK; compileall OK; strict static checks clean on both hardened files; the secret values (webhook token and
-path, sink token, OpenAI key) appear in no committed file.
+## Known issues
+- `src/replay/run.py:110-112`, `workflows/hardened/t2-hardened.json:482`, `tests/test_replay.py:210-213`: DeepSeek label, not renamed.
+- `docs/` is published by Jekyll, which also renders `docs/ARCHITECTURE.md` and `docs/DECISIONS.md`. Accepted for now.
 
-Update: T13 (`evals/findings.md`), T14 (README results + Loom script), T15 (Sheets notes) done. All task boxes ticked.
-Owner gates left: write § Trace notes in `evals/findings.md` (≥15 traces); approve the push; create the public link;
-optional cross-family review (Codex/GPT) before publishing.
-Local n8n: T2 workflows imported, none active.
+## Checks run 2026-10-14
+56 unit tests OK; compileall OK; strict static check on hardened JSON clean; secret grep clean on docs, workflows, evals.
